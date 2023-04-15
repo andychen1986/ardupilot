@@ -46,6 +46,7 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_Param',
     'AP_Rally',
     'AP_RangeFinder',
+    'AP_Inclination',
     'AP_Scheduler',
     'AP_SerialManager',
     'AP_Terrain',

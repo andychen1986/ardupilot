@@ -212,12 +212,17 @@ public:
         k_param_notify,
         k_param_button,
         k_param_osd,
+        
+
 
         k_param_logger = 253,  // Logging Group
 
         // 254,255: reserved
 
         k_param_vehicle = 257, // vehicle common block of parameters
+
+                //excavator control
+        k_param_inclination,    //inclination object
         };
 
     AP_Int16    format_version;
@@ -411,6 +416,9 @@ public:
     // Automatic Identification System - for tracking sea-going vehicles
     AP_AIS ais;
 #endif
+
+    //
+
 };
 
 extern const AP_Param::Info var_info[];

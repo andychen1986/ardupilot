@@ -290,6 +290,10 @@ const AP_Param::Info Rover::var_info[] = {
     // @Path: ../libraries/AP_RangeFinder/AP_RangeFinder.cpp
     GOBJECT(rangefinder,                 "RNGFND", RangeFinder),
 
+    // @Group: INCLINATION
+    // @Path: ../libraries/AP_Inclination/AP_Inclination.cpp
+    GOBJECT(inclination,                 "INCLI", Inclination),
+
     // @Group: INS_
     // @Path: ../libraries/AP_InertialSensor/AP_InertialSensor.cpp
     GOBJECT(ins,                            "INS_", AP_InertialSensor),

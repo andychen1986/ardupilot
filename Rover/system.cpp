@@ -74,6 +74,10 @@ void Rover::init_ardupilot()
     rangefinder.set_log_rfnd_bit(MASK_LOG_RANGEFINDER);
     rangefinder.init(ROTATION_NONE);
 
+    // initialise inclination sensors
+    inclination.set_log_icli_bit(MASK_LOG_ICLI);
+    inclination.init(LOCATION_NONE);
+
 #if HAL_PROXIMITY_ENABLED
     // init proximity sensor
     g2.proximity.init();

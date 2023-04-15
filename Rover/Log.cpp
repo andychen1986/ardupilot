@@ -1,6 +1,7 @@
 #include "Rover.h"
 
 #include <AP_RangeFinder/AP_RangeFinder_Backend.h>
+#include <AP_Inclination/AP_Inclination_Backend.h>
 
 #if LOGGING_ENABLED == ENABLED
 
@@ -304,6 +305,7 @@ const LogStructure Rover::log_structure[] = {
     
     { LOG_GUIDEDTARGET_MSG, sizeof(log_GuidedTarget),
       "GUIP",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ", "s-mmmnnn", "F-000000" },
+
 };
 
 void Rover::log_init(void)
@@ -316,6 +318,7 @@ void Rover::log_init(void)
 // dummy functions
 void Rover::Log_Write_Attitude() {}
 void Rover::Log_Write_Depth() {}
+void Rover::Log_Write_ICLI() {}
 void Rover::Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target) {}
 void Rover::Log_Write_Nav_Tuning() {}
 void Rover::Log_Write_Sail() {}

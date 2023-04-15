@@ -133,6 +133,7 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
 #if HAL_AIS_ENABLED
     SCHED_TASK_CLASS(AP_AIS, &rover.g2.ais, update, 5, 100, 135),
 #endif
+    SCHED_TASK(read_inclinations,      50,    200,   138),
 };
 
 

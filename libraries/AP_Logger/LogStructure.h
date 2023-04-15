@@ -438,6 +438,19 @@ struct PACKED log_RFND {
 };
 
 /*
+  inclination - support for 3 sensors
+ */
+struct PACKED log_ICLI_t {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    uint8_t instance;
+    float roll_deg;
+    float yaw_deg;
+    uint8_t status;
+    uint8_t location;
+};
+
+/*
   terrain log structure
  */
 struct PACKED log_TERRAIN {
@@ -1271,6 +1284,15 @@ struct PACKED log_VER {
 // @Field: ThrAvMx: Maximum average throttle that can be used to maintain attitude controll, derived from throttle mix params
 // @Field: FailFlags: bit 0 motor failed, bit 1 motors balanced, should be 2 in normal flight
 
+// @LoggerMessage: ICLI
+// @Description: Robotic arm rolling angle messages on excavator with different install location of inclination sensor
+// @Field: TimeUS: Time since system startup
+// @Field: Instance: inclination instance number this data is from
+// @Field: Roll: Roll angle from sensor
+// @Field: Temp: Temperature from sensor
+// @Field: Stat: Sensor state
+// @Field: Orient: Sensor orientation
+
 // messages for all boards
 #define LOG_COMMON_STRUCTURES \
     { LOG_FORMAT_MSG, sizeof(log_Format), \
@@ -1394,7 +1416,10 @@ LOG_STRUCTURE_FROM_AIS, \
     { LOG_VER_MSG, sizeof(log_VER), \
       "VER",   "QBHBBBBIZH", "TimeUS,BT,BST,Maj,Min,Pat,FWT,GH,FWS,APJ", "s---------", "F---------", false }, \
     { LOG_MOTBATT_MSG, sizeof(log_MotBatt), \
-      "MOTB", "QffffB",  "TimeUS,LiftMax,BatVolt,ThLimit,ThrAvMx,FailFlags", "s-----", "F-----" , true }
+      "MOTB", "QffffB",  "TimeUS,LiftMax,BatVolt,ThLimit,ThrAvMx,FailFlags", "s-----", "F-----" , true }, \
+    { LOG_ICLI_MSG, sizeof(log_ICLI_t), \
+      "ICLI", "QBffBB",  "TimeUS,Instance,Roll,Temp,State,Location", "s#----", "F-----" , true }
+
 
 // message types 0 to 63 reserved for vehicle specific use
 
@@ -1477,6 +1502,7 @@ enum LogMessages : uint8_t {
     LOG_VIDEO_STABILISATION_MSG,
     LOG_MOTBATT_MSG,
     LOG_VER_MSG,
+    LOG_ICLI_MSG,   //inclination sensors log
 
     _LOG_LAST_MSG_
 };

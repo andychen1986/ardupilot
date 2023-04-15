@@ -169,6 +169,7 @@ public:
         SerialProtocol_AIS = 40,
         SerialProtocol_CoDevESC = 41,
         SerialProtocol_MSP_DisplayPort = 42,
+        SerialProtocol_Inclination = 50,
         SerialProtocol_NumProtocols                    // must be the last value
     };
 

@@ -93,3 +93,9 @@ void Rover::read_rangefinders(void)
     rangefinder.update();
     Log_Write_Depth();
 }
+
+// read the inclinations
+void Rover::read_inclinations(void)
+{
+    inclination.update();
+}

@@ -17,6 +17,15 @@
  */
 #pragma once
 
+//Boom, forearm, bucket of excavator
+enum InstallLocation : uint8_t {
+        LOCATION_NONE                = 0,
+        Boom,
+        Forearm,
+        Bucket
+    };
+
+
 // these rotations form a full set - every rotation in the following
 // list when combined with another in the list forms an entry which is
 // also in the list. This is an important property. Please run the

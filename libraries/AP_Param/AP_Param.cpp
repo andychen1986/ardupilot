@@ -215,6 +215,7 @@ bool AP_Param::check_group_info(const struct AP_Param::GroupInfo *  group_info,
         uint8_t idx = group_info[i].idx;
         if (idx >= (1<<_group_level_shift)) {
             Debug("idx too large (%u) in %s", idx, group_info[i].name);
+            hal.console->printf("check_group_info 1--------...\n");
             return false;
         }
         if (group_shift != 0 && idx == 0) {
@@ -223,6 +224,7 @@ bool AP_Param::check_group_info(const struct AP_Param::GroupInfo *  group_info,
         }
         if (used_mask & (1ULL<<idx)) {
             Debug("Duplicate group idx %u for %s", idx, group_info[i].name);
+            hal.console->printf("check_group_info 2--------...\n");
             return false;
         }
         used_mask |= (1ULL<<idx);
@@ -230,6 +232,7 @@ bool AP_Param::check_group_info(const struct AP_Param::GroupInfo *  group_info,
             // a nested group
             if (group_shift + _group_level_shift >= _group_bits) {
                 Debug("double group nesting in %s", group_info[i].name);
+                hal.console->printf("check_group_info 3--------...\n");
                 return false;
             }
             const struct GroupInfo *ginfo = get_group_info(group_info[i]);
@@ -237,6 +240,7 @@ bool AP_Param::check_group_info(const struct AP_Param::GroupInfo *  group_info,
                 continue;
             }
             if (!check_group_info(ginfo, total_size, group_shift + _group_level_shift, prefix_length + strlen(group_info[i].name))) {
+                hal.console->printf("check_group_info 4--------...\n");
                 return false;
             }
             continue;
@@ -244,10 +248,12 @@ bool AP_Param::check_group_info(const struct AP_Param::GroupInfo *  group_info,
         uint8_t size = type_size((enum ap_var_type)type);
         if (size == 0) {
             Debug("invalid type in %s", group_info[i].name);
+            hal.console->printf("check_group_info 5--------...\n");
             return false;
         }
         if (prefix_length + strlen(group_info[i].name) > 16) {
             Debug("suffix is too long in %s", group_info[i].name);
+            hal.console->printf("check_group_info 6--------...\n");
             return false;
         }
         (*total_size) += size + sizeof(struct Param_header);

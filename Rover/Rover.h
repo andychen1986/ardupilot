@@ -44,6 +44,7 @@
 #include <AP_OpticalFlow/AP_OpticalFlow.h>          // Optical Flow library
 #include <AP_Param/AP_Param.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>          // Range finder library
+#include <AP_Inclination/AP_Inclination.h>          // inclination sensor library
 #include <AP_RCMapper/AP_RCMapper.h>                // RC input mapping library
 #include <AP_Scheduler/AP_Scheduler.h>              // main loop scheduler
 #include <AP_Stats/AP_Stats.h>                      // statistics library
@@ -212,6 +213,9 @@ private:
     // range finder last update for each instance (used for DPTH logging)
     uint32_t rangefinder_last_reading_ms[RANGEFINDER_MAX_INSTANCES];
 
+    // inclination last update for each instance (used for INCLI logging)
+    uint32_t inclination_last_reading_ms[INCLINATION_MAX_INSTANCES];
+
     // Ground speed
     // The amount current ground speed is below min ground speed.  meters per second
     float ground_speed;
@@ -327,6 +331,7 @@ private:
     // Log.cpp
     void Log_Write_Attitude();
     void Log_Write_Depth();
+    void Log_Write_ICLI();         //inclination sensors log
     void Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target);
     void Log_Write_Nav_Tuning();
     void Log_Write_Sail();
@@ -355,6 +360,7 @@ private:
     void compass_save(void);
     void update_wheel_encoder();
     void read_rangefinders(void);
+    void read_inclinations(void);
 
     // Steering.cpp
     void set_servos(void);
