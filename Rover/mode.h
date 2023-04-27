@@ -26,6 +26,7 @@ public:
         LOITER       = 5,
         FOLLOW       = 6,
         SIMPLE       = 7,
+        DIGGING      = 8,
         AUTO         = 10,
         RTL          = 11,
         SMART_RTL    = 12,
@@ -215,6 +216,32 @@ protected:
     float _distance_to_destination; // distance from vehicle to final destination in meters
     bool _reached_destination;  // true once the vehicle has reached the destination
     float _desired_yaw_cd;      // desired yaw in centi-degrees.  used in Auto, Guided and Loiter
+};
+
+class ModeDigging : public Mode
+{
+public:
+
+    uint32_t mode_number() const override { return DIGGING; }
+    const char *name4() const override { return "DIGG"; }
+
+    // methods that affect movement of the vehicle in this mode
+    void update() override;
+
+    // attributes for mavlink system status reporting
+    bool has_manual_input() const override { return true; }
+
+    // acro mode requires a velocity estimate for non skid-steer rovers
+    bool requires_position() const override { return false; }
+    bool requires_velocity() const override { return false; };
+
+protected:
+
+    bool _enter() override;
+    void _exit() override;
+
+private:
+    bool _init;
 };
 
 
