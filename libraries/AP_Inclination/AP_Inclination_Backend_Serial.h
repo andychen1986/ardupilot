@@ -19,18 +19,28 @@ protected:
     virtual uint32_t initial_baudrate(uint8_t serial_instance) const;
 
     // the value 0 is special to the UARTDriver - it's "use default"
-    virtual uint16_t rx_bufsize() const { return 0; }
-    virtual uint16_t tx_bufsize() const { return 0; }
+    virtual uint16_t rx_bufsize() const
+    {
+        return 0;
+    }
+    virtual uint16_t tx_bufsize() const
+    {
+        return 0;
+    }
 
     AP_HAL::UARTDriver *uart = nullptr;
 
     // update state; not all backends call this!
-    virtual void update(void) override;
+    virtual void update(enum InstallLocation location) override;
 
     // it is essential that anyone relying on the base-class update to
     // implement this:
-    virtual bool get_reading(float &reading_roll_deg, float &reading_yaw_deg) = 0;
+    //virtual bool get_reading(float &reading_roll_deg, float &reading_yaw_deg) = 0;
+    virtual bool get_reading(Vector3f &reading_roll_deg, Vector3f &reading_yaw_deg, InstallLocation loc) = 0;
 
     // maximum time between readings before we change state to NoData:
-    virtual uint16_t read_timeout_ms() const { return 200; }
+    virtual uint16_t read_timeout_ms() const
+    {
+        return 200;
+    }
 };

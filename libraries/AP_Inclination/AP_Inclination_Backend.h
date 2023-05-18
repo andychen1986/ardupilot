@@ -22,43 +22,90 @@ class AP_Inclination_Backend
 {
 public:
     // constructor. This incorporates initialisation as well.
-	AP_Inclination_Backend(Inclination::Inclination_State &_state, AP_Inclination_Params &_params);
+    AP_Inclination_Backend(Inclination::Inclination_State &_state, AP_Inclination_Params &_params);
 
     // we declare a virtual destructor so that Inclination drivers can
     // override with a custom destructor if need be
     virtual ~AP_Inclination_Backend(void) {}
 
     // update the state structure
-    virtual void update() = 0;
+    virtual void update(enum InstallLocation location) = 0;
     virtual void init_serial(uint8_t serial_instance) {};
 
-    enum InstallLocation location() const { return (InstallLocation)params.location.get(); }
-    float get_Roll_Deg() const { return state.roll_deg; }
-    float get_max_roll_deg() const {return params.max_roll_deg; }
-    float get_min_roll_deg() const {return params.min_roll_deg; }
-    float get_Yaw_Deg() const { return state.yaw_deg; }
-    
-    float get_Temperature() const { return state.temperature; }  
+    enum InstallLocation location() const
+    {
+        return (InstallLocation)params.location.get();
+    }
+    float get_roll_deg_from_location(enum InstallLocation loc) const
+    {
+        switch (loc) {
+        case InstallLocation::Boom:
+            return state.roll_deg.x;
+        case InstallLocation::Forearm:
+            return state.roll_deg.y;
+        case InstallLocation::Bucket:
+            return state.roll_deg.z;
+
+        default:
+            return state.roll_deg.x;
+        }
+    }
+
+    float get_max_roll_deg() const
+    {
+        return params.max_roll_deg;
+    }
+    float get_min_roll_deg() const
+    {
+        return params.min_roll_deg;
+    }
+    // float get_yaw_from_location(enum InstallLocation location) const { return nullptr }
+    //float get_yaw_deg_from_location(enum InstallLocation loc) const { return get_yaw_from_location(loc); }
+    float get_yaw_deg_from_location(enum InstallLocation loc) const
+    {
+        switch (loc) {
+        case InstallLocation::Boom:
+            return state.yaw_deg.x;
+        case InstallLocation::Forearm:
+            return state.yaw_deg.y;
+        case InstallLocation::Bucket:
+            return state.yaw_deg.z;
+
+        default:
+            return state.yaw_deg.x;
+        }
+    }
 
     Inclination::Status status() const;
-    Inclination::Type type() const { return (Inclination::Type)params.type.get(); }
+    Inclination::Type type() const
+    {
+        return (Inclination::Type)params.type.get();
+    }
 
     // true if sensor is returning data
     bool has_data() const;
 
     // return system time of last successful read from the sensor
-    uint32_t last_reading_ms() const { return state.last_reading_ms; }
-    
-    // get temperature reading in C.  returns true on success and populates temp argument
-    virtual bool get_temp_C(float &temp) const { return false; }
+    uint32_t last_reading_ms() const
+    {
+        return state.last_reading_ms;
+    }
+
+    // get temperature reading in Celsius  returns true on success and populates temp argument
+    virtual bool get_temp_C_from_loc(enum InstallLocation location, float &temp) const
+    {
+        return false;
+    }
 
 protected:
 
     // update status based on angle measurement
-    void update_status();
+    void update_status(enum InstallLocation location);
 
     // set status and update valid_count
     void set_status(Inclination::Status status);
+
+
 
     Inclination::Inclination_State &state;
     AP_Inclination_Params &params;

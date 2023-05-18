@@ -17,7 +17,7 @@
  */
 #pragma once
 
-//Boom, forearm, bucket of excavator
+//Install the inclination at Boom/forearm/bucket of excavator
 enum InstallLocation : uint8_t {
         LOCATION_NONE                = 0,
         Boom,

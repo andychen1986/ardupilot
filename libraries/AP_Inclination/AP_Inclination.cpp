@@ -15,6 +15,7 @@
 
 #include "AP_Inclination.h"
 #include "AP_Inclination_HDA436T_Serial.h"
+#include "AP_Inclination_3HDA436Ts_Serial.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -24,9 +25,9 @@ extern const AP_HAL::HAL &hal;
 // table of user settable parameters
 const AP_Param::GroupInfo Inclination::var_info[] = {
 
-	// @Group: 1_
-	// @Path: AP_Inclination_Params.cpp
-	AP_SUBGROUPINFO(params[0], "1_", 25, Inclination, AP_Inclination_Params),
+    // @Group: 1_
+    // @Path: AP_Inclination_Params.cpp
+    AP_SUBGROUPINFO(params[0], "1_", 25, Inclination, AP_Inclination_Params),
 
     // @Group: 1_
     // @Path: AP_Inclination_Params.cpp
@@ -51,7 +52,7 @@ const AP_Param::GroupInfo Inclination::var_info[] = {
     // @Path: AP_Inclination_Params.cpp
     AP_SUBGROUPVARPTR(drivers[2], "3_",  59, Inclination, backend_var_info[2]),
 #endif
-    
+
     AP_GROUPEND
 };
 
@@ -70,7 +71,7 @@ Inclination::Inclination()
 }
 
 /*
-  initialise the Inclination class. We do detection of attached 
+  initialise the Inclination class. We do detection of attached
   Inclinations here. For now we won't allow for hot-plugging of
   Inclinations.
  */
@@ -84,7 +85,7 @@ void Inclination::init(InstallLocation location_default)
 
     // set orientation defaults
     for (uint8_t i=0; i<INCLINATION_MAX_INSTANCES; i++) {
-        params[i].location.set_default(location_default);
+        params[i].location.set_default(location_default + i+1);
     }
 
     for (uint8_t i=0, serial_instance = 0; i<INCLINATION_MAX_INSTANCES; i++) {
@@ -92,7 +93,7 @@ void Inclination::init(InstallLocation location_default)
         // if a serial driver is loaded for this instance
         WITH_SEMAPHORE(detect_sem);
         detect_instance(i, serial_instance);
-        
+
         // initialise status
         state[i].status = Status::NotConnected;
         state[i].range_valid_count = 0;
@@ -113,10 +114,17 @@ void Inclination::update(void)
                 state[i].range_valid_count = 0;
                 continue;
             }
-           
-            drivers[i]->update();
+
+            drivers[i]->update((InstallLocation)(i+1));
         }
     }
+
+    //if AP_Inclination_3HDA436Ts_Serial is used, then update the other 2 drivers state by hand.
+    if ((Type)params[0].type.get() == Type::three_HDA436Ts_Serial) {
+        state[1] = state[0];
+        state[2] = state[0];
+    }
+
 #if HAL_LOGGING_ENABLED
     Log_ICLI();
 #endif
@@ -141,7 +149,7 @@ bool Inclination::_add_backend(AP_Inclination_Backend *backend, uint8_t instance
 }
 
 /*
-  detect if an instance of a inclination is connected. 
+  detect if an instance of a inclination is connected.
  */
 void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
 {
@@ -154,11 +162,19 @@ void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
         }
         break;
 
-//     case Type::SIM:
-// #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-//         _add_backend(new AP_Inclination_SITL(state[instance], params[instance], instance), instance);
-// #endif
-//         break;
+    case Type::three_HDA436Ts_Serial:
+        if (AP_Inclination_3HDA436Ts_Serial::detect(serial_instance)) {
+            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance], params[instance]), instance, serial_instance++);
+            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance+1], params[instance+1]), instance+1, serial_instance++);
+            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance+2], params[instance+2]), instance+2, serial_instance++);
+        }
+        break;
+
+    //     case Type::SIM:
+    // #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+    //         _add_backend(new AP_Inclination_SITL(state[instance], params[instance], instance), instance);
+    // #endif
+    //         break;
 
     case Type::NONE:
     default:
@@ -175,7 +191,8 @@ void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
     }
 }
 
-AP_Inclination_Backend *Inclination::get_backend(uint8_t id) const {
+AP_Inclination_Backend *Inclination::get_backend(uint8_t id) const
+{
     if (id >= num_instances) {
         return nullptr;
     }
@@ -232,7 +249,7 @@ float Inclination::roll_deg_location(enum InstallLocation location) const
     if (backend == nullptr) {
         return 0;
     }
-    return backend->get_Roll_Deg();
+    return backend->get_roll_deg_from_location(location);
 }
 
 bool Inclination::has_data_location(enum InstallLocation location) const
@@ -260,7 +277,7 @@ bool Inclination::get_temp_C_location(enum InstallLocation location, float &temp
     if (backend == nullptr) {
         return false;
     }
-    return backend->get_temp_C(temp);
+    return backend->get_temp_C_from_loc(location, temp);
 }
 
 //Write an ICLI (inclination) packet
@@ -270,7 +287,7 @@ void Inclination::Log_ICLI() const
         return;
     }
 
-    /** This comment can be canceled after the ground station modifies param:LOG_BITMASK   
+    /** This comment can be canceled after the ground station modifies param:LOG_BITMASK
         #define MASK_LOG_ICLI (1UL<<21)
         In inclination.set_log_icli_bit(MASK_LOG_ICLI);  */
 
@@ -286,13 +303,13 @@ void Inclination::Log_ICLI() const
         }
 
         const struct log_ICLI_t pkt = {
-                LOG_PACKET_HEADER_INIT(LOG_ICLI_MSG),
-                time_us      : AP_HAL::micros64(),
-                instance     : i,
-                roll_deg     : s->get_Roll_Deg(),
-                yaw_deg      : s->get_Yaw_Deg(),
-                status       : (uint8_t)s->status(),
-                location     : s->location(),
+            LOG_PACKET_HEADER_INIT(LOG_ICLI_MSG),
+time_us      : AP_HAL::micros64(),
+instance     : i,
+roll_deg     : s->get_roll_deg_from_location(s->location()),
+yaw_deg      : s->get_yaw_deg_from_location(s->location()),
+status       : (uint8_t)s->status(),
+location     : s->location(),
         };
         AP::logger().WriteBlock(&pkt, sizeof(pkt));
     }
@@ -319,7 +336,7 @@ bool Inclination::prearm_healthy(char *failure_msg, const uint8_t failure_msg_le
             return false;
         case Status::OutOfRangeLow:
         case Status::OutOfRangeHigh:
-        case Status::Good:  
+        case Status::Good:
             break;
         }
     }
@@ -329,7 +346,8 @@ bool Inclination::prearm_healthy(char *failure_msg, const uint8_t failure_msg_le
 
 Inclination *Inclination::_singleton;
 
-namespace AP {
+namespace AP
+{
 
 Inclination *inclination()
 {

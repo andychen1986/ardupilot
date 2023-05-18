@@ -41,6 +41,7 @@ public:
     enum class Type {
         NONE   = 0,
         HDA436T_Serial = 1,
+        three_HDA436Ts_Serial = 2,
         SIM = 100,
     };
 
@@ -54,10 +55,10 @@ public:
 
     // The Inclination_State structure is filled in by the backend driver
     struct Inclination_State {
-        float roll_deg;                 // angle in degree
-        float pitch_deg;                // angle in degree
-        float yaw_deg;                  // angle in degree  
-        float temperature;      
+        Vector3f roll_deg;                 // roll_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+        Vector3f pitch_deg;                // pitch_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+        Vector3f yaw_deg;                  // yaw_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+        Vector3f temperature;              // temperature.x/.y/.z denote boom/forearm/bucket angle in degree
         enum Inclination::Status status; // sensor status
         uint8_t  range_valid_count;     // number of consecutive valid readings (maxes out at 3)
         uint32_t last_reading_ms;       // system time of last successful update from sensor
@@ -70,11 +71,15 @@ public:
     // parameters for each instance
     static const struct AP_Param::GroupInfo var_info[];
 
-    void set_log_icli_bit(uint32_t log_icli_bit) { _log_icli_bit = log_icli_bit; }
+    void set_log_icli_bit(uint32_t log_icli_bit)
+    {
+        _log_icli_bit = log_icli_bit;
+    }
 
 
-    //Return the number of inclination instances. 
-    uint8_t num_sensors(void) const {
+    //Return the number of inclination instances.
+    uint8_t num_sensors(void) const
+    {
         return num_instances;
     }
 
@@ -97,7 +102,8 @@ public:
     AP_Inclination_Backend *get_backend(uint8_t id) const;
 
     // get inclination type for an ID
-    Type get_type(uint8_t id) const {
+    Type get_type(uint8_t id) const
+    {
         return id >= INCLINATION_MAX_INSTANCES? Type::NONE : Type(params[id].type.get());
     }
 
@@ -109,7 +115,10 @@ public:
     uint32_t last_reading_ms(enum InstallLocation location) const;
     bool get_temp_C_location(enum InstallLocation location, float &temp) const;
 
-    static Inclination *get_singleton(void) { return _singleton; }
+    static Inclination *get_singleton(void)
+    {
+        return _singleton;
+    }
 
 protected:
     AP_Inclination_Params params[INCLINATION_MAX_INSTANCES];
@@ -131,6 +140,7 @@ private:
     void Log_ICLI() const;
 };
 
-namespace AP {
-    Inclination *inclination();
+namespace AP
+{
+Inclination *inclination();
 };

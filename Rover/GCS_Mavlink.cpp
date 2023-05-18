@@ -189,8 +189,8 @@ void GCS_MAVLINK_Rover::send_rangefinder() const
 
     mavlink_msg_rangefinder_send(
             chan,
-            incli_backend->get_Roll_Deg(),
-            incli_backend->get_Yaw_Deg());
+            incli_backend->get_roll_deg_from_location(Boom),
+            incli_backend->get_yaw_deg_from_location(Boom));
 }
 
 /*

@@ -21,17 +21,18 @@
 extern const AP_HAL::HAL& hal;
 
 /*
-  base class constructor. 
+  base class constructor.
   This incorporates initialisation as well.
 */
 AP_Inclination_Backend::AP_Inclination_Backend(Inclination::Inclination_State &_state, AP_Inclination_Params &_params) :
-        state(_state),
-		params(_params)
+    state(_state),
+    params(_params)
 {
     _backend_type = type();
 }
 
-Inclination::Status AP_Inclination_Backend::status() const {
+Inclination::Status AP_Inclination_Backend::status() const
+{
     if (type() == Inclination::Type::NONE) {
         // turned off at runtime?
         return Inclination::Status::NotConnected;
@@ -40,18 +41,19 @@ Inclination::Status AP_Inclination_Backend::status() const {
 }
 
 // true if sensor is returning data
-bool AP_Inclination_Backend::has_data() const {
+bool AP_Inclination_Backend::has_data() const
+{
     return ((state.status != Inclination::Status::NotConnected) &&
             (state.status != Inclination::Status::NoData));
 }
 
 // update status based on roll angle measurement
-void AP_Inclination_Backend::update_status()
+void AP_Inclination_Backend::update_status(enum InstallLocation loc)
 {
     // check roll angle
-    if (state.roll_deg > get_max_roll_deg()) {
+    if (get_roll_deg_from_location(loc) > get_max_roll_deg()) {
         set_status(Inclination::Status::OutOfRangeHigh);
-    } else if (state.roll_deg < get_min_roll_deg()) {
+    } else if (get_roll_deg_from_location(loc) < get_min_roll_deg()) {
         set_status(Inclination::Status::OutOfRangeLow);
     } else {
         set_status(Inclination::Status::Good);

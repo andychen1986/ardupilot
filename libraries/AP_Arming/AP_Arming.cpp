@@ -31,6 +31,7 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Baro/AP_Baro.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>
+#include <AP_Inclination/AP_Inclination.h>
 #include <AP_Generator/AP_Generator.h>
 #include <AP_Terrain/AP_Terrain.h>
 #include <AP_ADSB/AP_ADSB.h>
@@ -790,6 +791,24 @@ bool AP_Arming::rangefinder_checks(bool report)
     return true;
 }
 
+bool AP_Arming::inclination_checks(bool report)
+{
+    if ((checks_to_perform & ARMING_CHECK_ALL) || (checks_to_perform & ARMING_CHECK_INCLINATION)) {
+        Inclination *incli = Inclination::get_singleton();
+        if (incli == nullptr) {
+            return true;
+        }
+
+        char buffer[MAVLINK_MSG_STATUSTEXT_FIELD_TEXT_LEN+1];
+        if (!incli->prearm_healthy(buffer, ARRAY_SIZE(buffer))) {
+            check_failed(ARMING_CHECK_INCLINATION, report, "%s", buffer);
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool AP_Arming::servo_checks(bool report) const
 {
 #if NUM_SERVO_CHANNELS
@@ -1291,6 +1310,7 @@ bool AP_Arming::pre_arm_checks(bool report)
         &  manual_transmitter_checks(report)
         &  mission_checks(report)
         &  rangefinder_checks(report)
+        &  inclination_checks(report)
         &  servo_checks(report)
         &  board_voltage_checks(report)
         &  system_checks(report)
