@@ -1,10 +1,18 @@
 #include "mode.h"
 #include "Rover.h"
 
+bool ModeManual::_enter()
+{
+    g2.servo_channels.change_servo_out_for_excavator();
+    return true;
+}
+
 void ModeManual::_exit()
 {
     // clear lateral when exiting manual mode
     g2.motors.set_lateral(0);
+
+    g2.servo_channels.recovery_servo_out_from_functions_copy();
 }
 
 void ModeManual::update()

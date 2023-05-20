@@ -400,6 +400,12 @@ public:
     // adjust trim of a channel by a small increment
     void adjust_trim(SRV_Channel::Aux_servo_function_t function, float v);
 
+    //entering manual mode, servo_out is changed to excavator-specific
+    void change_servo_out_for_excavator();
+
+    //restore servo_out to backup in functions_copy
+    void recovery_servo_out_from_functions_copy();
+
     // set MIN/MAX parameters for a function
     static void set_output_min_max(SRV_Channel::Aux_servo_function_t function, uint16_t min_pwm, uint16_t max_pwm);
     
@@ -623,6 +629,18 @@ private:
         // scaled output for this function
         float output_scaled;
     } functions[SRV_Channel::k_nr_aux_servo_functions];
+
+    //Variable for excavator entering manual mode switching servo_out
+    SRV_Channel::Aux_servo_function_t functions_copy[NUM_SERVO_CHANNELS];
+    SRV_Channel::Aux_servo_function_t functions_excavator[NUM_SERVO_CHANNELS] = {\
+    SRV_Channel::Aux_servo_function_t::k_rcin9, SRV_Channel::Aux_servo_function_t::k_none, \
+    SRV_Channel::Aux_servo_function_t::k_rcin10, SRV_Channel::Aux_servo_function_t::k_none, \
+    SRV_Channel::Aux_servo_function_t::k_rcin3, SRV_Channel::Aux_servo_function_t::k_rcin2, \
+    SRV_Channel::Aux_servo_function_t::k_rcin1, SRV_Channel::Aux_servo_function_t::k_rcin4, \
+    SRV_Channel::Aux_servo_function_t::k_GPIO, SRV_Channel::Aux_servo_function_t::k_GPIO, \
+    SRV_Channel::Aux_servo_function_t::k_GPIO, SRV_Channel::Aux_servo_function_t::k_GPIO, \
+    SRV_Channel::Aux_servo_function_t::k_none, SRV_Channel::Aux_servo_function_t::k_none, \
+    SRV_Channel::Aux_servo_function_t::k_none, SRV_Channel::Aux_servo_function_t::k_none};
 
     AP_Int8 auto_trim;
     AP_Int16 default_rate;

@@ -834,3 +834,23 @@ void SRV_Channels::set_rc_frequency(SRV_Channel::Aux_servo_function_t function, 
         hal.rcout->set_freq(mask, frequency_hz);
     }
 }
+
+//entering manual mode, servo_out is changed to excavator-specific
+void SRV_Channels::change_servo_out_for_excavator()
+{
+    for (int i=0; i<NUM_SERVO_CHANNELS; i++) {
+        SRV_Channels::functions_copy[i] = SRV_Channels::channels[i].get_function();
+    }
+    
+    for (int i=0; i<NUM_SERVO_CHANNELS; i++) {
+        SRV_Channels::channels[i].function_set_and_save(SRV_Channels::functions_excavator[i]);
+    }
+}
+
+//restore servo_out to backup in functions_copy
+void SRV_Channels::recovery_servo_out_from_functions_copy()
+{
+    for (int i=0; i<NUM_SERVO_CHANNELS; i++) {
+        SRV_Channels::channels[i].function_set_and_save(SRV_Channels::functions_copy[i]);
+    }
+}
