@@ -3,9 +3,9 @@
 #include "GCS.h"
 
 void MissionItemProtocol::init_send_requests(GCS_MAVLINK &_link,
-                                             const mavlink_message_t &msg,
-                                             const int16_t _request_first,
-                                             const int16_t _request_last)
+        const mavlink_message_t &msg,
+        const int16_t _request_first,
+        const int16_t _request_last)
 {
     // set variables to help handle the expected receiving of commands from the GCS
     timelast_receive_ms = AP_HAL::millis();    // set time we last received commands to now
@@ -23,7 +23,7 @@ void MissionItemProtocol::init_send_requests(GCS_MAVLINK &_link,
 }
 
 void MissionItemProtocol::handle_mission_clear_all(const GCS_MAVLINK &_link,
-                                                   const mavlink_message_t &msg)
+        const mavlink_message_t &msg)
 {
     bool success = true;
     success = success && !receiving;
@@ -88,7 +88,6 @@ void MissionItemProtocol::handle_mission_count(
         transfer_is_complete(_link, msg);
         return;
     }
-
     // start waypoint receiving
     init_send_requests(_link, msg, 0, packet.count-1);
 }
@@ -119,8 +118,8 @@ void MissionItemProtocol::handle_mission_request_list(
 }
 
 void MissionItemProtocol::handle_mission_request_int(const GCS_MAVLINK &_link,
-                                                     const mavlink_mission_request_int_t &packet,
-                                                     const mavlink_message_t &msg)
+        const mavlink_mission_request_int_t &packet,
+        const mavlink_message_t &msg)
 {
     if (!mavlink2_requirement_met(_link, msg)) {
         return;
@@ -152,9 +151,9 @@ void MissionItemProtocol::handle_mission_request_int(const GCS_MAVLINK &_link,
 }
 
 void MissionItemProtocol::handle_mission_request(const GCS_MAVLINK &_link,
-                                                 const mavlink_mission_request_t &packet,
-                                                 const mavlink_message_t &msg
-)
+        const mavlink_mission_request_t &packet,
+        const mavlink_message_t &msg
+                                                )
 {
     if (!mavlink2_requirement_met(_link, msg)) {
         return;
@@ -190,8 +189,8 @@ void MissionItemProtocol::handle_mission_request(const GCS_MAVLINK &_link,
 }
 
 void MissionItemProtocol::handle_mission_write_partial_list(GCS_MAVLINK &_link,
-                                                            const mavlink_message_t &msg,
-                                                            const mavlink_mission_write_partial_list_t &packet)
+        const mavlink_message_t &msg,
+        const mavlink_mission_write_partial_list_t &packet)
 {
 
     // start waypoint receiving
@@ -235,7 +234,6 @@ void MissionItemProtocol::handle_mission_item(const mavlink_message_t &msg, cons
     }
 
     const uint16_t _item_count = item_count();
-
     MAV_MISSION_RESULT result;
     if (cmd.seq < _item_count) {
         // command index is within the existing list, replace the command
@@ -281,7 +279,7 @@ void MissionItemProtocol::transfer_is_complete(const GCS_MAVLINK &_link, const m
 }
 
 void MissionItemProtocol::send_mission_ack(const mavlink_message_t &msg,
-                                           MAV_MISSION_RESULT result) const
+        MAV_MISSION_RESULT result) const
 {
     if (link == nullptr) {
         INTERNAL_ERROR(AP_InternalError::error_t::gcs_bad_missionprotocol_link);
@@ -290,8 +288,8 @@ void MissionItemProtocol::send_mission_ack(const mavlink_message_t &msg,
     send_mission_ack(*link, msg, result);
 }
 void MissionItemProtocol::send_mission_ack(const GCS_MAVLINK &_link,
-                                           const mavlink_message_t &msg,
-                                           MAV_MISSION_RESULT result) const
+        const mavlink_message_t &msg,
+        MAV_MISSION_RESULT result) const
 {
     mavlink_msg_mission_ack_send(_link.get_chan(),
                                  msg.sysid,
