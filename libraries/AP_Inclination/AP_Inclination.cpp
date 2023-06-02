@@ -213,7 +213,18 @@ Inclination::Status Inclination::status_location(enum InstallLocation location) 
     }
     return backend->status();
 }
-
+Vector3f Inclination::get_deg_location(enum InstallLocation location) const
+{
+    AP_Inclination_Backend *backend = find_instance(location);
+    if (backend == nullptr) {
+        Vector3f s;
+        s.x = 0;
+        s.y = 0;
+        s.z = 0;
+        return s;
+    }
+    return backend->get_deg_from_location(location);
+}
 // return true if we have a Inclination with the specified install location
 bool Inclination::has_location(enum InstallLocation location) const
 {
