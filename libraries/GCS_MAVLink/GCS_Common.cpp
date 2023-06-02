@@ -504,6 +504,8 @@ MissionItemProtocol *GCS::get_prot_for_mission_type(const MAV_MISSION_TYPE missi
         return _missionitemprotocol_rally;
     case MAV_MISSION_TYPE_FENCE:
         return _missionitemprotocol_fence;
+    case MAV_MISSION_TYPE_ROBOTARMWP:
+        return _missionitemprotocol_robotarmwp;
     default:
         return nullptr;
     }
@@ -2120,6 +2122,10 @@ void GCS::update_send()
         if (fence != nullptr) {
             _missionitemprotocol_fence = new MissionItemProtocol_Fence(*fence);
         }
+        AE_RobotArmWP *robotarmwp = AE::robotarmwp();
+        if (robotarmwp != nullptr) {
+            _missionitemprotocol_robotarmwp = new MissionItemProtocol_RobotArmWP(*robotarmwp);
+        }
     }
     if (_missionitemprotocol_waypoints != nullptr) {
         _missionitemprotocol_waypoints->update();
@@ -2129,6 +2135,9 @@ void GCS::update_send()
     }
     if (_missionitemprotocol_fence != nullptr) {
         _missionitemprotocol_fence->update();
+    }
+    if (_missionitemprotocol_robotarmwp != nullptr) {
+        _missionitemprotocol_robotarmwp->update();
     }
 #endif // HAL_BUILD_AP_PERIPH
     // round-robin the GCS_MAVLINK backend that gets to go first so
@@ -4820,6 +4829,11 @@ bool GCS_MAVLINK::try_send_mission_message(const enum ap_message id)
         gcs().try_send_queued_message_for_type(MAV_MISSION_TYPE_FENCE);
         ret = true;
         break;
+    case MSG_NEXT_MISSION_REQUEST_ROBOTARMWP:
+        CHECK_PAYLOAD_SIZE(MISSION_REQUEST);
+        gcs().try_send_queued_message_for_type(MAV_MISSION_TYPE_ROBOTARMWP);
+        ret = true;
+        break;
     default:
         ret = true;
         break;
@@ -5188,6 +5202,7 @@ bool GCS_MAVLINK::try_send_message(const enum ap_message id)
     case MSG_NEXT_MISSION_REQUEST_WAYPOINTS:
     case MSG_NEXT_MISSION_REQUEST_RALLY:
     case MSG_NEXT_MISSION_REQUEST_FENCE:
+    case MSG_NEXT_MISSION_REQUEST_ROBOTARMWP:
         ret = try_send_mission_message(id);
         break;
 
@@ -5953,7 +5968,11 @@ uint64_t GCS_MAVLINK::capabilities() const
         ret |= MAV_PROTOCOL_CAPABILITY_MISSION_FENCE;
     }
 
-    if (!AP_BoardConfig::ftp_disabled()){  //if ftp disable board option is not set
+    if (AE::robotarmwp()) {
+        ret |= MAV_PROTOCOL_CAPABILITY_MISSION_ROBOTARMWP;
+    }
+
+    if (!AP_BoardConfig::ftp_disabled()) { //if ftp disable board option is not set
         ret |= MAV_PROTOCOL_CAPABILITY_FTP;
     }
  
