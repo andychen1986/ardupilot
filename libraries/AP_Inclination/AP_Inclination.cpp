@@ -243,13 +243,14 @@ AP_Inclination_Backend *Inclination::find_instance(enum InstallLocation location
     return nullptr;
 }
 
-float Inclination::roll_deg_location(enum InstallLocation location) const
+Vector3f Inclination::get_deg_location(enum InstallLocation location) const
 {
     AP_Inclination_Backend *backend = find_instance(location);
     if (backend == nullptr) {
-        return 0;
+        AP_HAL::panic("Inclination backend is nullptr, please check the hardware and param table:ICLI->LOCATION.");
+        return {0,0,0};
     }
-    return backend->get_roll_deg_from_location(location);
+    return backend->get_deg_from_location(location);
 }
 
 bool Inclination::has_data_location(enum InstallLocation location) const
@@ -304,12 +305,12 @@ void Inclination::Log_ICLI() const
 
         const struct log_ICLI_t pkt = {
             LOG_PACKET_HEADER_INIT(LOG_ICLI_MSG),
-time_us      : AP_HAL::micros64(),
-instance     : i,
-roll_deg     : s->get_roll_deg_from_location(s->location()),
-yaw_deg      : s->get_yaw_deg_from_location(s->location()),
-status       : (uint8_t)s->status(),
-location     : s->location(),
+                    time_us      : AP_HAL::micros64(),
+                    instance     : i,
+                    roll_deg     : s->get_roll_deg_from_location(s->location()),
+                    yaw_deg      : s->get_yaw_deg_from_location(s->location()),
+                    status       : (uint8_t)s->status(),
+                    location     : s->location(),
         };
         AP::logger().WriteBlock(&pkt, sizeof(pkt));
     }

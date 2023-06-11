@@ -45,6 +45,7 @@
 #include <AP_Param/AP_Param.h>
 #include <AP_RangeFinder/AP_RangeFinder.h>          // Range finder library
 #include <AP_Inclination/AP_Inclination.h>          // inclination sensor library
+#include <AE_RobotArmInfo/AE_RobotArmInfo.h>          // robot arm info library
 #include <AP_RCMapper/AP_RCMapper.h>                // RC input mapping library
 #include <AP_Scheduler/AP_Scheduler.h>              // main loop scheduler
 #include <AP_Stats/AP_Stats.h>                      // statistics library

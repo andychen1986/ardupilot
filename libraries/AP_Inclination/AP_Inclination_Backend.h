@@ -76,6 +76,31 @@ public:
         }
     }
 
+    //return Vector3f deg.x/y/z is roll/pitch/yaw
+    Vector3f get_deg_from_location(enum InstallLocation loc) const
+    {
+        Vector3f deg;
+        switch (loc) {
+        case InstallLocation::Boom:
+            deg.x = state.roll_deg.x;
+            deg.y = state.pitch_deg.x;
+            deg.z = state.yaw_deg.x;
+             return deg;
+        case InstallLocation::Forearm:
+            deg.x = state.roll_deg.y;
+            deg.y = state.pitch_deg.y;
+            deg.z = state.yaw_deg.y;
+             return deg;
+        case InstallLocation::Bucket:
+            deg.x = state.roll_deg.z;
+            deg.y = state.pitch_deg.z;
+            deg.z = state.yaw_deg.z;
+             return deg;
+        default:
+            return deg;
+        }
+    }
+
     Inclination::Status status() const;
     Inclination::Type type() const
     {
