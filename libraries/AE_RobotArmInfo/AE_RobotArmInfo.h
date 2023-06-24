@@ -68,6 +68,7 @@ public:
         enum Ex_OC_Name cylinder_name;
     };
 
+    //TBM Cutting Header Cylinder State
     struct TBM_CH_Cylinder_State {
         float length_mm;                        // mm
         float velocity_mms;                     // mm/s
@@ -129,9 +130,7 @@ private:
     // Excavator param, refer to the website below to determine the specific meaning of the paramters
     // https://gitee.com/andychen183/roadheader_gcs/issues/I7BLTG
     struct EXCVT_PARAM{
-        AP_Float    _boom_cylinder_max;     // The maximum stroke of the boom oil cylinder
-        AP_Float    _forearm_cylinder_max;  // The maximum stroke of the forearm oil cylinder
-        AP_Float    _bucket_cylinder_max;   // The maximum stroke of the bucket oil cylinder
+        AP_Float    _cylinder_max[3];       //The maximum stroke of the boom/forearm/bucket oil cylinder
         AP_Float    _mm_JC;
         AP_Float    _mm_CF;
         AP_Float    _mm_FQ;
@@ -163,7 +162,16 @@ private:
     // TBM param, refer to the website below to determine the specific meaning of the paramters
     // 
     struct TBM_PARAM{
-        //TBM_PARAM
+        //TBM_PARAM    
+        AP_Float    _cylinder_max[2];       //The maximum stroke of the cutting arm lift/direction oil cylinder    
+        AP_Float    _mm_AC;
+        AP_Float    _mm_BC;
+        AP_Float    _mm_CF;
+        AP_Float    _mm_JL;
+        AP_Float    _mm_JC;
+        AP_Float    _deg_BFC;
+        AP_Float    _deg_BCF;
+        AP_Float    _deg_TCA;
     } tbm_param;
 
     static AE_RobotArmInfo *_singleton; //singleton

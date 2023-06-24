@@ -23,19 +23,19 @@ public:
     // AP_TBM_Info::TBM_Cutting_Header_State get_TBM_cutting_header_state() const { return _cutting_header_state; }
 
     //update the cutting header state at base's body frame
-    // void  AP_TBM_Info::update_TBM_cutting_header_state(const Vector3f &boom_atti_deg);    
+    // void  AP_TBM_Info::update_TBM_cutting_header_state(const Vector3f &boom_atti_deg);
 
 private:
 
     // backend state
     struct Excavator_Robot_Arm_State {
         float rbt_arm_yaw_body;
-        enum AE_RobotArmInfo::Component_name component; 
+        enum AE_RobotArmInfo::Component_name component;
         Vector3f boom_tip_pos_body;
         Vector3f forearm_tip_pos_body;
         Vector3f bucket_tip_pos_body;
         struct AE_RobotArmInfo::Ex_Cylinder_State cylinder_status[OIL_CYLINDER_NUM_MAX];
-    }ex_info;
+    } ex_info;
 
     // struct Excavator_Arm_State {
     //     float height;

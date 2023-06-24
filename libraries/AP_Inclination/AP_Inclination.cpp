@@ -253,6 +253,26 @@ Vector3f Inclination::get_deg_location(enum InstallLocation location) const
     return backend->get_deg_from_location(location);
 }
 
+float Inclination::roll_deg_location(enum InstallLocation location) const
+{
+    AP_Inclination_Backend *backend = find_instance(location);
+    if (backend == nullptr) {
+        AP_HAL::panic("Inclination backend is nullptr, please check the hardware and param table:ICLI->LOCATION.");
+        return 0;
+    }
+    return backend->get_roll_deg_from_location(location);
+}
+
+float Inclination::yaw_deg_location(enum InstallLocation location) const
+{
+    AP_Inclination_Backend *backend = find_instance(location);
+    if (backend == nullptr) {
+        AP_HAL::panic("Inclination backend is nullptr, please check the hardware and param table:ICLI->LOCATION.");
+        return 0;
+    }
+    return backend->get_yaw_deg_from_location(location);
+}
+
 bool Inclination::has_data_location(enum InstallLocation location) const
 {
     AP_Inclination_Backend *backend = find_instance(location);
