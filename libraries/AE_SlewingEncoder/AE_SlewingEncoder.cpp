@@ -257,7 +257,7 @@ void AE_SlewingEncoder::Log_SLEN() const
     struct log_SlewingEncoder pkt = {
         LOG_PACKET_HEADER_INIT(LOG_SLEN_MSG),
         time_us                 : AP_HAL::micros64(),
-        angle_diff_base2arm     : get_angle_deg_diff_base2arm_loc(Install_Location::INSTALL_SLEWING),
+        angle_diff_base2arm     : degrees(get_angle_deg_diff_base2arm_loc(Install_Location::INSTALL_SLEWING)),
         single_turn_count       : get_single_turn_count_loc(Install_Location::INSTALL_SLEWING),
         total_turns_count       : get_total_turns_count_loc(Install_Location::INSTALL_SLEWING),        
         amp_yaw                 : (uint16_t)ahrs.yaw_sensor,

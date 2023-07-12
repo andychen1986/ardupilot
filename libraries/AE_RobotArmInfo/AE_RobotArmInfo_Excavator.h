@@ -1,4 +1,3 @@
-
 #pragma once
 #include "AE_RobotArmInfo_Backend.h"
 
@@ -37,15 +36,12 @@ private:
         struct AE_RobotArmInfo::Ex_Cylinder_State cylinder_status[OIL_CYLINDER_NUM_MAX];
     } ex_info;
 
-    // struct Excavator_Arm_State {
-    //     float height;
-    //     float yaw;
-    //     struct AE_RobotArmInfo::Cylinder_State status[EXCAVATOR_ARM_CYLINDER_NUM];
-    // };
-    bool calc_excavator_info(void);
-    bool calc_bucket_position(void);
-    bool calc_oil_sylinder_length(void);
+    void Write_Excavator_ArmInfo();
+    bool calc_excavator_info(const AP_AHRS &_ahrs, const Inclination *_inclination);
+    void calc_bucket_position(float boom,float forearm,float bucket,float slewing);
+    void calc_oil_cylinder_length(float boom_to_slewing,float forearm_to_boom,float bucket_to_forearm);
     bool update_excavator_struct(void);
     bool check_if_info_valid(struct Excavator_Robot_Arm_State& ex_state);
+    void adjust_to_body_origin(float euler_boom, float euler_forearm, float euler_bucket, float &boom_to_body,float &forearm_to_body,float &bucket_to_body); 
 
 };

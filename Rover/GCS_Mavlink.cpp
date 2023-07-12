@@ -199,7 +199,7 @@ void GCS_MAVLINK_Rover::send_rangefinder() const
 
     mavlink_msg_rangefinder_send(
             chan,
-            slewingEncoder->get_angle_deg_diff_base2arm_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING),
+            degrees(slewingEncoder->get_angle_deg_diff_base2arm_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING)),
             slewingEncoder->get_full_turns_counts_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING));
 }
 
