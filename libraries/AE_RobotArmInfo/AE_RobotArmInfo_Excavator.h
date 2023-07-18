@@ -1,5 +1,8 @@
 #pragma once
 #include "AE_RobotArmInfo_Backend.h"
+#include <AP_Inclination/AP_Inclination.h>
+#include <AP_AHRS/AP_AHRS.h>
+#include <AE_SlewingEncoder/AE_SlewingEncoder.h>
 
 #ifndef EXCAVATOR_ARM_CYLINDER_NUM
 #define EXCAVATOR_ARM_CYLINDER_NUM 3
@@ -40,7 +43,8 @@ private:
     } ex_info;
 
     void Write_Excavator_ArmInfo();
-    bool calc_excavator_info(const AP_AHRS &_ahrs, const Inclination *_inclination);
+
+    bool calc_excavator_info(const AP_AHRS &ahrs, const Inclination *inclination, const AE_SlewingEncoder *slewingencoder);
     void calc_bucket_position(float boom,float forearm,float bucket,float slewing);
     void calc_oil_cylinder_length(float boom_to_slewing,float forearm_to_boom,float bucket_to_forearm);
     bool update_excavator_struct(void);

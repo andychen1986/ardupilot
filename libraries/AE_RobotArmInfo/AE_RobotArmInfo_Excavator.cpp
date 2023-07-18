@@ -38,14 +38,20 @@ void AE_RobotArmInfo_Excavator::update()
         return;
     }
 
-    const AP_AHRS &ahrs = AP::ahrs();
-
-    ex_info.rbt_arm_yaw_body = ahrs.get_yaw();
-    if (!calc_excavator_info(ahrs, inclination)) {
-        // update health
-        _state.flags.healthy = false;
+    AE_SlewingEncoder *slewingencoder = AE::slewingencoder();
+    if(slewingencoder == nullptr){
+        AP_HAL::panic("AE_RobotArmInfo_TBM should be got slewingencoder data before calc");
+        return;
     }
 
+    const AP_AHRS &ahrs = AP::ahrs();
+
+    if(!calc_excavator_info(ahrs,inclination,slewingencoder)){
+      // update health
+      _state.flags.healthy = false;
+    }    
+    
+    //计算完成后把挖掘机类的私有变量赋给结构体供外界调用
     if (check_if_info_valid(ex_info)) {
         _state.flags.healthy = true;
     }
@@ -68,8 +74,9 @@ bool AE_RobotArmInfo_Excavator::check_if_info_valid(struct Excavator_Robot_Arm_S
 }
 
 // return false if the excavator information has not been calculated exactly.
-bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &_ahrs, const Inclination *_inclination)
+bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &ahrs, const Inclination *inclination, const AE_SlewingEncoder *slewingencoder)
 {
+
     Matrix3f transformation;
     Matrix3f boom_matrix;
     Matrix3f forearm_matrix;
@@ -80,23 +87,21 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &_ahrs, const 
     float boom_to_body;
     float forearm_to_body;
     float bucket_to_body;
-    float slewing_to_body;
-    float boom_to_slewing;
-    float forearm_to_boom;
-    float bucket_to_forearm;
     
-    transformation.from_euler(_ahrs.get_roll(),_ahrs.get_pitch(),radians(_inclination->yaw_deg_location(Boom)));
+    //sensor's coordinate transformation from earth coordinate to body coordinate
+    transformation.from_euler(ahrs.get_roll(),ahrs.get_pitch(),ahrs.get_yaw()-M_PI/2);
     if(!transformation.invert())
     {
         return false;
     }
-    _euler_boom_e2b_from_sensor     = _inclination->get_deg_location(Boom);
-    _euler_forearm_e2b_from_sensor  = _inclination->get_deg_location(Forearm);
-    _euler_bucket_e2b_from_sensor   = - _inclination->get_deg_location(Bucket);
+    _euler_boom_e2b_from_sensor = inclination->get_deg_location(Boom);
+    _euler_forearm_e2b_from_sensor = inclination->get_deg_location(Forearm);
+    //bucket sensor installation is mounted in the opposite direction to the boom/forearm
+    _euler_bucket_e2b_from_sensor = -inclination->get_deg_location(Bucket);
 
-    boom_matrix.from_euler(radians(_euler_boom_e2b_from_sensor.x),radians(_euler_boom_e2b_from_sensor.y),radians(_euler_boom_e2b_from_sensor.z));
-    forearm_matrix.from_euler(radians(_euler_forearm_e2b_from_sensor.x),radians(_euler_forearm_e2b_from_sensor.y),radians(_euler_forearm_e2b_from_sensor.z));
-    bucket_matrix.from_euler(radians(_euler_bucket_e2b_from_sensor.x),radians(_euler_bucket_e2b_from_sensor.y),radians(_euler_bucket_e2b_from_sensor.z));
+    boom_matrix.from_euler(radians(_euler_boom_e2b_from_sensor.x),radians(_euler_boom_e2b_from_sensor.y),ahrs.get_yaw());
+    forearm_matrix.from_euler(radians(_euler_forearm_e2b_from_sensor.x),radians(_euler_forearm_e2b_from_sensor.y),ahrs.get_yaw());
+    bucket_matrix.from_euler(radians(_euler_bucket_e2b_from_sensor.x),radians(_euler_bucket_e2b_from_sensor.y),ahrs.get_yaw());
     
     boom_matrix = transformation*boom_matrix;
     forearm_matrix = transformation*forearm_matrix;
@@ -106,12 +111,31 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &_ahrs, const 
     forearm_matrix.to_euler(&_euler_forearm_e2b_from_sensor.x,&_euler_forearm_e2b_from_sensor.y,&_euler_forearm_e2b_from_sensor.z);
     bucket_matrix.to_euler(&_euler_bucket_e2b_from_sensor.x,&_euler_bucket_e2b_from_sensor.y,&_euler_bucket_e2b_from_sensor.z);
 
-    slewing_to_body = radians(_inclination->yaw_deg_location(Boom));
-    adjust_to_body_origin(_euler_boom_e2b_from_sensor.y,_euler_forearm_e2b_from_sensor.y,_euler_bucket_e2b_from_sensor.y,boom_to_body,forearm_to_body,bucket_to_body);
-    boom_to_slewing = boom_to_body;
-    forearm_to_boom = forearm_to_body - boom_to_slewing;
-    bucket_to_forearm = bucket_to_body - forearm_to_boom - boom_to_slewing;
- 
+    //get boom and slewing angle diff
+    float slewing_to_body = slewingencoder->get_angle_deg_diff_base2arm_loc(slewingencoder->INSTALL_SLEWING);
+
+    adjust_to_body_origin(_euler_boom_e2b_from_sensor.x,_euler_forearm_e2b_from_sensor.x,_euler_bucket_e2b_from_sensor.x,boom_to_body,forearm_to_body,bucket_to_body);
+    //Get the angle of boom, forearm, bucket relative to the previous joint
+    float boom_to_slewing = boom_to_body;
+    float forearm_to_boom = forearm_to_body - boom_to_slewing;
+    float bucket_to_forearm = bucket_to_body - forearm_to_boom - boom_to_slewing;
+/*     
+    //Used to test whether the coordinate system transformation is correct 
+    AP::logger().Write("BP", "TimeUS,BoomR,BoomP,BoomY,ForeR,ForeP,ForeY,buckR,buckP,buckY",
+                "sm", // units: seconds, meters
+                "FB", // mult: 1e-6, 1e-2
+                "Qfffffffff", // format: uint64_t, float, float, float, float, float, float, float, float, float
+                AP_HAL::micros64(),
+                (float)degrees(_euler_boom_e2b_from_sensor.x),
+                (float)degrees(_euler_boom_e2b_from_sensor.y),
+                (float)degrees(_euler_boom_e2b_from_sensor.z),
+                (float)degrees(_euler_forearm_e2b_from_sensor.x),
+                (float)degrees(_euler_forearm_e2b_from_sensor.y),
+                (float)degrees(_euler_forearm_e2b_from_sensor.z),
+                (float)degrees(_euler_bucket_e2b_from_sensor.x),
+                (float)degrees(_euler_bucket_e2b_from_sensor.y),
+                (float)degrees(_euler_bucket_e2b_from_sensor.z)); */
+       
     calc_bucket_position(boom_to_body,forearm_to_body,bucket_to_body,slewing_to_body);
     calc_oil_cylinder_length(boom_to_slewing,forearm_to_boom,bucket_to_forearm);
     return true;
@@ -119,33 +143,28 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &_ahrs, const 
 
 void AE_RobotArmInfo_Excavator::calc_oil_cylinder_length(float boom_to_slewing,float forearm_to_boom,float bucket_to_forearm)
 {
-    float angle_ACB;
-    float phi;
-    float angle_KQN;
-    float distance_NK;
-    float angle_MNK;
-    float angle_QNK;
-    float angle_GNM;
-    angle_ACB = radians(get_ex_param()._deg_TCA) + radians(get_ex_param()._deg_BCF) + boom_to_slewing;
-    ex_info.cylinder_status[0].length_mm = sqrt(get_ex_param()._mm_AC * get_ex_param()._mm_AC + get_ex_param()._mm_BC * get_ex_param()._mm_BC - 2*get_ex_param()._mm_AC*get_ex_param()._mm_BC*cos(angle_ACB));
-    phi = (M_PI - radians(get_ex_param()._deg_DFC) -radians(get_ex_param()._deg_QFG) -radians(get_ex_param()._deg_GFE) - forearm_to_boom);
-    ex_info.cylinder_status[1].length_mm = sqrt(get_ex_param()._mm_DF * get_ex_param()._mm_DF + get_ex_param()._mm_EF*get_ex_param()._mm_EF -2*get_ex_param()._mm_EF*get_ex_param()._mm_DF*cos(phi));
-    angle_KQN = M_PI - radians(get_ex_param()._deg_NQF) -bucket_to_forearm -radians(get_ex_param()._deg_KQV);
-    distance_NK = sqrt(get_ex_param()._mm_QN*get_ex_param()._mm_QN + get_ex_param()._mm_QK *get_ex_param()._mm_QK
-                    - 2*get_ex_param()._mm_QK*get_ex_param()._mm_QN*cos(angle_KQN));
-    angle_MNK = acos((get_ex_param()._mm_MN *get_ex_param()._mm_MN + distance_NK*distance_NK
-                        - get_ex_param()._mm_MK *get_ex_param()._mm_MK)/(2*get_ex_param()._mm_MN*distance_NK));
-    angle_QNK = asin(get_ex_param()._mm_QK*sin(angle_KQN)/distance_NK);
-    angle_GNM = M_2_PI - radians(get_ex_param()._deg_GNF) - radians(get_ex_param()._deg_GNQ) - angle_MNK - angle_QNK;
-    ex_info.cylinder_status[2].length_mm = sqrt(get_ex_param()._mm_GN *get_ex_param()._mm_GN + get_ex_param()._mm_MN*get_ex_param()._mm_MN 
+  float angle_ACB = radians(get_ex_param()._deg_TCA) + radians(get_ex_param()._deg_BCF) + boom_to_slewing;
+  ex_info.cylinder_status[0].length_mm = sqrt(get_ex_param()._mm_AC * get_ex_param()._mm_AC + get_ex_param()._mm_BC * get_ex_param()._mm_BC 
+                                            - 2*get_ex_param()._mm_AC*get_ex_param()._mm_BC*cos(angle_ACB));
+  float phi = (M_PI - radians(get_ex_param()._deg_DFC) -radians(get_ex_param()._deg_QFG) -radians(get_ex_param()._deg_GFE) - forearm_to_boom);
+  ex_info.cylinder_status[1].length_mm = sqrt(get_ex_param()._mm_DF * get_ex_param()._mm_DF + get_ex_param()._mm_EF*get_ex_param()._mm_EF 
+                                            -2*get_ex_param()._mm_EF*get_ex_param()._mm_DF*cos(phi));
+  float angle_KQN = M_PI - radians(get_ex_param()._deg_NQF) -bucket_to_forearm -radians(get_ex_param()._deg_KQV);
+  float distance_NK = sqrt(get_ex_param()._mm_QN*get_ex_param()._mm_QN + get_ex_param()._mm_QK *get_ex_param()._mm_QK
+                        - 2*get_ex_param()._mm_QK*get_ex_param()._mm_QN*cos(angle_KQN));
+  float angle_MNK = acos((get_ex_param()._mm_MN *get_ex_param()._mm_MN + distance_NK*distance_NK - 
+                        get_ex_param()._mm_MK *get_ex_param()._mm_MK)/(2*get_ex_param()._mm_MN*distance_NK));
+  float angle_QNK = asin(get_ex_param()._mm_QK*sin(angle_KQN)/distance_NK);
+  float angle_GNM = M_2_PI - radians(get_ex_param()._deg_GNF) - radians(get_ex_param()._deg_FNQ) - angle_MNK - angle_QNK;
+  ex_info.cylinder_status[2].length_mm = sqrt(get_ex_param()._mm_GN *get_ex_param()._mm_GN + get_ex_param()._mm_MN*get_ex_param()._mm_MN 
                                             - 2*get_ex_param()._mm_MN*get_ex_param()._mm_GN*cos(angle_GNM));
+  //
 }
 
  // return false if the position isn't calculated.
  // Calculate the three-dimensional coordinates of the tooth tip relative to the body
 void AE_RobotArmInfo_Excavator::calc_bucket_position(float boom,float forearm,float bucket,float slewing)
 {
-    //在这里写你的算法,想要获取什么值，跟下面的方法类似get_ex_param()._mm_QV
     ex_info.bucket_tip_pos_body.x = cosf(slewing)*(get_ex_param()._mm_QV*cosf(bucket) + get_ex_param()._mm_FQ*cosf(forearm)
     + get_ex_param()._mm_CF*cosf(boom) + get_ex_param()._mm_JC);
     ex_info.bucket_tip_pos_body.y = sinf(slewing)*(get_ex_param()._mm_QV*cosf(bucket) + get_ex_param()._mm_FQ*cosf(forearm)

@@ -3,7 +3,8 @@
 
 #include <AP_Logger/AP_Logger.h>
 #include "AE_RobotArmInfo_TBM.h"
-
+#include <AP_Inclination/AP_Inclination.h>
+#include <AE_SlewingEncoder/AE_SlewingEncoder.h>
 
 // perform any required initialisation of backend
 void AE_RobotArmInfo_TBM::init()
@@ -71,9 +72,11 @@ void AE_RobotArmInfo_TBM::update()
         // update health
         _state.flags.healthy = false;
     }
-
-    if (check_if_cutting_head_info_valid(_cuthead_state)) {
-        _state.flags.healthy = true;
+    
+    //计算完成后把挖掘机类的私有变量赋给结构体供外界调用
+    if(check_if_cutting_head_info_valid(_cuthead_state))
+    {
+      _state.flags.healthy = true;
     }
 
     Write_TBM_CutheadInfo();
