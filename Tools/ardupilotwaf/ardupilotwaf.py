@@ -45,6 +45,7 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_OpticalFlow',
     'AP_Param',
     'AP_Rally',
+    'AE_Motors',
     'AE_RobotArmWP',
     'AE_SlewingEncoder',
     'AP_RangeFinder',

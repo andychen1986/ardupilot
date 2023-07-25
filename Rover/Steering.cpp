@@ -18,3 +18,8 @@ void Rover::set_servos(void)
         g2.motors.output(arming.is_armed(), speed, G_Dt);
     }
 }
+
+void Rover::set_AE_servos(void)
+{
+    g2.arm_motors.output(arming.is_armed(), G_Dt);
+}

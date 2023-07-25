@@ -236,6 +236,10 @@ public:
         FWD_THR =            209, // VTOL manual forward throttle
         AIRBRAKE =           210, // manual airbrake control
         WALKING_HEIGHT =     211, // walking robot height input
+        BOOM =               212, // excavator joint
+        FOREARM =            213,
+        BUCKET =             214,
+        ROTATION =           215,
 
         // inputs for the use of onboard lua scripting
         SCRIPTING_1 =        300,

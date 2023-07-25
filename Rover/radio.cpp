@@ -9,12 +9,28 @@ void Rover::set_control_channels(void)
     channel_steer    = rc().channel(rcmap.roll()-1);
     channel_throttle = rc().channel(rcmap.throttle()-1);
     channel_lateral  = rc().channel(rcmap.yaw()-1);
+    channel_boom  = rc().channel(rcmap.boom()-1);
+    channel_forearm  = rc().channel(rcmap.forearm()-1);
+    channel_bucket  = rc().channel(rcmap.bucket()-1);
+    channel_rotation  = rc().channel(rcmap.rotation()-1);
 
     // set rc channel ranges
     channel_steer->set_angle(SERVO_MAX);
     channel_throttle->set_angle(100);
     if (channel_lateral != nullptr) {
         channel_lateral->set_angle(100);
+    }
+    if (channel_boom != nullptr) {
+        channel_boom->set_angle(100);
+    }
+    if (channel_forearm != nullptr) {
+        channel_forearm->set_angle(100);
+    }
+    if (channel_bucket != nullptr) {
+        channel_bucket->set_angle(100);
+    }
+    if (channel_rotation != nullptr) {
+        channel_rotation->set_angle(100);
     }
 
     // walking robots rc input init
@@ -42,12 +58,20 @@ void Rover::set_control_channels(void)
         g2.motors.setup_servo_output();
         // For a rover safety is TRIM throttle
         g2.motors.setup_safety_output();
+
+        g2.arm_motors.setup_servo_output();
+        // For a AE_rover safety is TRIM throttle
+        g2.arm_motors.setup_safety_output();
     }
     // setup correct scaling for ESCs like the UAVCAN ESCs which
     // take a proportion of speed. Default to 1000 to 2000 for systems without
     // a k_throttle output
     hal.rcout->set_esc_scaling(1000, 2000);
     g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_throttle);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_boom);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_forearm);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_bucket);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_rotation);
 }
 
 void Rover::init_rc_in()
@@ -58,10 +82,23 @@ void Rover::init_rc_in()
     if (channel_lateral != nullptr) {
         channel_lateral->set_default_dead_zone(30);
     }
+    if (channel_boom != nullptr) {
+        channel_boom->set_default_dead_zone(30);
+    }
+    if (channel_forearm != nullptr) {
+        channel_forearm->set_default_dead_zone(30);
+    }
+    if (channel_bucket != nullptr) {
+        channel_bucket->set_default_dead_zone(30);
+    }
+    if (channel_rotation != nullptr) {
+        channel_rotation->set_default_dead_zone(30);
+    }
 }
 
 /*
   check for driver input on rudder/steering stick for arming/disarming
+  允许使用方向摇杆解锁
 */
 void Rover::rudder_arm_disarm_check()
 {
@@ -103,7 +140,7 @@ void Rover::rudder_arm_disarm_check()
             // not at full right rudder
             rudder_arm_timer = 0;
         }
-    } else if ((arming_rudder == AP_Arming::RudderArming::ARMDISARM) && !g2.motors.active()) {
+    } else if ((arming_rudder == AP_Arming::RudderArming::ARMDISARM) && !g2.motors.active() && !g2.arm_motors.active()) {//在excavator禁用摇杆解锁
         // when armed and motor not active (not moving), full left rudder starts disarming counter
         if (channel_steer->get_control_in() < -4000) {
             const uint32_t now = millis();

@@ -11,6 +11,10 @@ Mode::Mode() :
     channel_roll(rover.channel_roll),
     channel_pitch(rover.channel_pitch),
     channel_walking_height(rover.channel_walking_height),
+    channel_boom(rover.channel_boom),
+    channel_forearm(rover.channel_forearm),
+    channel_bucket(rover.channel_bucket),
+    channel_rotation(rover.channel_rotation),
     attitude_control(rover.g2.attitude_control)
 { }
 

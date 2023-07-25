@@ -209,6 +209,10 @@ protected:
     class RC_Channel *&channel_roll;
     class RC_Channel *&channel_pitch;
     class RC_Channel *&channel_walking_height;
+    class RC_Channel *&channel_boom;
+    class RC_Channel *&channel_forearm;
+    class RC_Channel *&channel_bucket;
+    class RC_Channel *&channel_rotation;
     class AR_AttitudeControl &attitude_control;
 
     // private members for waypoint navigation

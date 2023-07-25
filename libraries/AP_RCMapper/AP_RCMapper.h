@@ -36,6 +36,19 @@ public:
     /// lateral - return input channel number for lateral input
     uint8_t lateral() const { return _ch_lateral; }
 
+    /// boom - return input channel number for boom input
+    uint8_t boom() const { return _ch_boom; }
+
+    /// forearm - return input channel number for forearm input
+    uint8_t forearm() const { return _ch_forearm; }
+
+    /// bucket - return input channel number for bucket input
+    uint8_t bucket() const { return _ch_bucket; }
+
+    /// rotation - return input channel number for rotation input
+    uint8_t rotation() const { return _ch_rotation; }
+
+
     static const struct AP_Param::GroupInfo var_info[];
 
 private:
@@ -46,6 +59,10 @@ private:
     AP_Int8 _ch_throttle;
     AP_Int8 _ch_forward;
     AP_Int8 _ch_lateral;
+    AP_Int8 _ch_boom;
+    AP_Int8 _ch_forearm;
+    AP_Int8 _ch_bucket;
+    AP_Int8 _ch_rotation;
     static RCMapper *_singleton;
 };
 

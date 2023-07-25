@@ -1219,6 +1219,10 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     case AUX_FUNC::SCRIPTING_6:
     case AUX_FUNC::SCRIPTING_7:
     case AUX_FUNC::SCRIPTING_8:
+    case AUX_FUNC::BOOM:
+    case AUX_FUNC::FOREARM:
+    case AUX_FUNC::BUCKET:
+    case AUX_FUNC::ROTATION:
         break;
 
     default:

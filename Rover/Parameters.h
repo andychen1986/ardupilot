@@ -311,6 +311,7 @@ public:
 
     // Motor library
     AP_MotorsUGV motors;
+    AE_Motors arm_motors;
 
     // wheel encoders
     AP_WheelEncoder wheel_encoder;
@@ -356,6 +357,9 @@ public:
 
     // frame type for vehicle (used for vectored motor vehicles and custom motor configs)
     AP_Int8 frame_type;
+
+    // frame type for AE machinery
+    AP_Int8 AE_type;
 
     // loiter type
     AP_Int8 loit_type;

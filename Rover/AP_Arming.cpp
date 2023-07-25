@@ -202,7 +202,7 @@ bool AP_Arming_Rover::mode_checks(bool report)
 // check motors are ready
 bool AP_Arming_Rover::motor_checks(bool report)
 {
-    bool ret = rover.g2.motors.pre_arm_check(report);
+    bool ret = rover.g2.motors.pre_arm_check(report) && rover.g2.arm_motors.pre_arm_check(report);
 
 #if HAL_TORQEEDO_ENABLED
     char failure_msg[50];

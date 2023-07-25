@@ -25,7 +25,7 @@ void ModeManual::update()
     g2.motors.set_roll(desired_roll);
     g2.motors.set_pitch(desired_pitch);
     g2.motors.set_walking_height(desired_walking_height);
-
+/*
     // set sailboat sails
     float desired_mainsail;
     float desired_wingsail;
@@ -34,9 +34,20 @@ void ModeManual::update()
     g2.motors.set_mainsail(desired_mainsail);
     g2.motors.set_wingsail(desired_wingsail);
     g2.motors.set_mast_rotation(desired_wingsail);
-
+*/
     // copy RC scaled inputs to outputs
     g2.motors.set_throttle(desired_throttle);
     g2.motors.set_steering(desired_steering, false);
     g2.motors.set_lateral(desired_lateral);
+
+    // copy RC scaled inputs to AE_Motors outputs
+    float desired_boom, desired_forearm, desired_bucket, desired_rotation;
+    desired_boom = constrain_float(rover.channel_boom->get_control_in(),-100.0f,100.0f);
+    desired_forearm = constrain_float(rover.channel_forearm->get_control_in(),-100.0f,100.0f);
+    desired_bucket = constrain_float(rover.channel_bucket->get_control_in(),-100.0f,100.0f);
+    desired_rotation = constrain_float(rover.channel_rotation->get_control_in(),-100.0f,100.0f);
+    g2.arm_motors.set_boom(desired_boom);
+    g2.arm_motors.set_forearm(desired_forearm);
+    g2.arm_motors.set_bucket(desired_bucket);
+    g2.arm_motors.set_rotation(desired_rotation);
 }

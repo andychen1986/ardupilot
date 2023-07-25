@@ -70,6 +70,7 @@
 #include <AP_OSD/AP_OSD.h>
 #include <AP_WindVane/AP_WindVane.h>
 #include <AR_Motors/AP_MotorsUGV.h>
+#include <AE_Motors/AE_Motors.h>
 #include <AP_Torqeedo/AP_Torqeedo.h>
 #include <AP_AIS/AP_AIS.h>
 
@@ -146,6 +147,10 @@ private:
     RC_Channel *channel_roll;
     RC_Channel *channel_pitch;
     RC_Channel *channel_walking_height;
+    RC_Channel *channel_boom;
+    RC_Channel *channel_forearm;
+    RC_Channel *channel_bucket;
+    RC_Channel *channel_rotation;
 
     AP_Logger logger;
 
@@ -366,6 +371,7 @@ private:
 
     // Steering.cpp
     void set_servos(void);
+    void set_AE_servos(void);
 
     // Rover.cpp
     void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
@@ -426,6 +432,7 @@ public:
 
     // frame type
     uint8_t get_frame_type() const { return g2.frame_type.get(); }
+    uint8_t get_AE_type() const { return g2.AE_type.get(); }
     AP_WheelRateControl& get_wheel_rate_control() { return g2.wheel_rate_control; }
 
     // Simple mode

@@ -9,7 +9,7 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @Increment: 1
     // @User: Advanced
     // @RebootRequired: True
-    AP_GROUPINFO("ROLL",        0, RCMapper, _ch_roll, 1),
+    AP_GROUPINFO("ROLL",        0, RCMapper, _ch_roll, 10),
 
     // @Param: PITCH
     // @DisplayName: Pitch channel
@@ -18,7 +18,7 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @Increment: 1
     // @User: Advanced
     // @RebootRequired: True
-    AP_GROUPINFO("PITCH",       1, RCMapper, _ch_pitch, 2),
+    AP_GROUPINFO("PITCH",       1, RCMapper, _ch_pitch, 16),
 
     // @Param: THROTTLE
     // @DisplayName: Throttle channel
@@ -27,7 +27,7 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @Increment: 1
     // @User: Advanced
     // @RebootRequired: True
-    AP_GROUPINFO("THROTTLE",    2, RCMapper, _ch_throttle, 3),
+    AP_GROUPINFO("THROTTLE",    2, RCMapper, _ch_throttle, 9),
 
     // @Param: YAW
     // @DisplayName: Yaw channel
@@ -36,7 +36,7 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @Increment: 1
     // @User: Advanced
     // @RebootRequired: True
-    AP_GROUPINFO("YAW",         3, RCMapper, _ch_yaw, 4),
+    AP_GROUPINFO("YAW",         3, RCMapper, _ch_yaw, 8),
 
     // @Param{Rover,Sub}: FORWARD
     // @DisplayName: Forward channel
@@ -55,6 +55,42 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @User: Advanced
     // @RebootRequired: True
     AP_GROUPINFO_FRAME("LATERAL",    5, RCMapper, _ch_lateral, 7, AP_PARAM_FRAME_SUB),
+
+    // @Param{Rover,Sub}: BOOM
+    // @DisplayName: Boom channel
+    // @Description: 
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("BOOM",    6, RCMapper, _ch_boom, 3, AP_PARAM_FRAME_ROVER ),
+
+    // @Param{Rover,Sub}: FOREARM
+    // @DisplayName: Forearm channel
+    // @Description: 
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("FOREARM",    7, RCMapper, _ch_forearm, 2, AP_PARAM_FRAME_ROVER ),
+
+    // @Param{Rover,Sub}: BUCKET
+    // @DisplayName: Bucket channel
+    // @Description: 
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("BUCKET",    8, RCMapper, _ch_bucket, 1, AP_PARAM_FRAME_ROVER ),
+
+    // @Param{Rover,Sub}: ROTATION
+    // @DisplayName: Rotation channel
+    // @Description: 
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("ROTATION",    9, RCMapper, _ch_rotation, 4, AP_PARAM_FRAME_ROVER ),
 
     AP_GROUPEND
 };

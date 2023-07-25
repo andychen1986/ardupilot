@@ -438,6 +438,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Path: ../libraries/AR_Motors/AP_MotorsUGV.cpp
     AP_SUBGROUPINFO(motors, "MOT_", 8, ParametersG2, AP_MotorsUGV),
 
+
     // @Group: WENC
     // @Path: ../libraries/AP_WheelEncoder/AP_WheelEncoder.cpp
     AP_SUBGROUPINFO(wheel_encoder, "WENC", 9, ParametersG2, AP_WheelEncoder),
@@ -531,6 +532,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     // @RebootRequired: True
     AP_GROUPINFO("FRAME_TYPE", 24, ParametersG2, frame_type, 0),
+
 
     // @Param: LOIT_TYPE
     // @DisplayName: Loiter type
@@ -682,6 +684,18 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(slewing_encoder, "SE", 53, ParametersG2, AE_SlewingEncoder),
 #endif
 
+    // @Group: AEMOT_
+    // @Path: ../libraries/AR_Motors/AE_Motors.cpp
+    AP_SUBGROUPINFO(arm_motors, "AEMOT_", 54, ParametersG2, AE_Motors),
+
+    // @Param: AE_TYPE
+    // @DisplayName: AE Type
+    // @Description: AE Type
+    // @Values: 0:Undefined,1:excavator,2:TBM
+    // @User: Standard
+    // @RebootRequired: True
+    AP_GROUPINFO("CON_TYPE", 55, ParametersG2, AE_type, 0),
+
     AP_GROUPEND
 };
 
@@ -722,6 +736,7 @@ ParametersG2::ParametersG2(void)
 #endif
     beacon(rover.serial_manager),
     motors(rover.ServoRelayEvents, wheel_rate_control),
+    arm_motors(rover.ServoRelayEvents),
     wheel_rate_control(wheel_encoder),
     attitude_control(),
     smart_rtl(),
