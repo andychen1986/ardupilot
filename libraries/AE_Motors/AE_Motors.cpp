@@ -198,12 +198,6 @@ void AE_Motors::output(bool armed,  float dt)
         // output to excavator's boom , forearm , bucket and rotation channels
         output_TBM(armed, _boom, _rotation);
     }
-
-    // send values to the PWM timers for output
-    SRV_Channels::calc_pwm();
-    SRV_Channels::cork();
-    SRV_Channels::output_ch_all();
-    SRV_Channels::push();
 }
 
 //  returns true if checks pass, false if they fail.  report should be true to send text messages to GCS

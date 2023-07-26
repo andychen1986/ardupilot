@@ -95,7 +95,8 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
 {
     //get this time and dt
     uint64_t t_us = AP_HAL::micros64();
-    _dt = float((t_us - _last_t_us))/1000000;
+    static uint8_t count = 0;
+    _dt += float((t_us - _last_t_us))/1000000;
 
     Vector3f _euler_boom_e2b_from_sensor;
     float boom_to_body;
@@ -105,7 +106,7 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
     Matrix3f transformation;
     Matrix3f boom_matrix;
 
-    transformation.from_euler(_ahrs.get_roll(),_ahrs.get_pitch(),radians(_inclination->yaw_deg_location(Boom)));
+    transformation.from_euler(_ahrs.get_roll(),_ahrs.get_pitch(),radians(_inclination->yaw_deg_location(Boom) - 90));
     if(!transformation.invert())
     {
         return false;
@@ -119,7 +120,7 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
 
     //calculate cutting head infomation including height,hor,cyl length,height speed,hor speed 
     //height and hor
-    boom_to_body = _euler_boom_e2b_from_sensor.y + radians(get_tbm_param()._deg_BFC);
+    boom_to_body = _euler_boom_e2b_from_sensor.x + radians(get_tbm_param()._deg_BFC);
 
     // slewing deg while cutting head is in mid deg=0,should use information from encoder but now use inclination
     slewing_to_body = slewingencoder->get_angle_deg_diff_base2arm_loc(slewingencoder->INSTALL_SLEWING);
@@ -137,13 +138,23 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
     // sin(radians(get_tbm_param()._deg_OBA)-slewing_to_body/2))-get_tbm_param()._mm_AB;
 
     //speed
-    _cuthead_state.cutheader_vertical_vel = (_cuthead_state.cutheader_height - _cutting_header_height_last)/_dt;
-    _cuthead_state.cutheader_horizon_vel = (_cuthead_state.cutheader_horizon_pos - _cutting_header_hor_last)/_dt;
+    if(count >= 3)
+    {
+        _cuthead_state.cutheader_vertical_vel = (_cuthead_state.cutheader_height - _cutting_header_height_last)/_dt;
+        _cuthead_state.cutheader_horizon_vel = (_cuthead_state.cutheader_horizon_pos - _cutting_header_hor_last)/_dt;
+        _cuthead_state.cutheader_vertical_vel = low_pass_filter_vertical_vel.apply(_cuthead_state.cutheader_vertical_vel, _dt);
+        _cuthead_state.cutheader_horizon_vel  = low_pass_filter_horizon_vel.apply(_cuthead_state.cutheader_horizon_vel, _dt);
+        
+        _dt = 0;
+        count = 0;
+        
+        _cutting_header_height_last = _cuthead_state.cutheader_height;
+        _cutting_header_hor_last = _cuthead_state.cutheader_horizon_pos;
+    }
 
     //save this infomation to last infomation for next calculate
     _last_t_us = t_us;
-    _cutting_header_height_last = _cuthead_state.cutheader_height;
-    _cutting_header_hor_last = _cuthead_state.cutheader_horizon_pos;
+    count++;
 
     return true;
 }
@@ -159,14 +170,16 @@ bool AE_RobotArmInfo_TBM::check_if_cutting_head_info_valid(struct TBM_Cutting_He
 
 void AE_RobotArmInfo_TBM::Write_TBM_CutheadInfo()
 {
-    AP::logger().Write("ARMP", "TimeUS,height,horiz,boomLength",
-                       "sm", // units: seconds, meters
-                       "FB", // mult: 1e-6, 1e-2
-                       "Qfff", // format: uint64_t, float, float, float
+    AP::logger().Write("ARMP", "TimeUS,height,horiz,boomLength,Vvel,Hvel",
+                       "smmmnn", // units: seconds, meters
+                       "FBBBBB", // mult: 1e-6, 1e-2
+                       "Qfffff", // format: uint64_t, float, float, float
                        AP_HAL::micros64(),
                        (float)_cuthead_state.cutheader_height,
                        (float)_cuthead_state.cutheader_horizon_pos,
-                       (float)_cuthead_state.cylinder_status[0].length_mm);
+                       (float)_cuthead_state.cylinder_status[0].length_mm,
+                       (float)_cuthead_state.cutheader_vertical_vel,
+                       (float)_cuthead_state.cutheader_horizon_vel);
 }
 
 

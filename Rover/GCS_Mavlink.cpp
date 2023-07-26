@@ -5,6 +5,10 @@
 #include <AP_RangeFinder/AP_RangeFinder_Backend.h>
 #include <AP_Inclination/AP_Inclination.h>
 #include <AP_Inclination/AP_Inclination_Backend.h>
+#include <AE_RobotArmInfo/AE_RobotArmInfo.h>
+#include <AE_RobotArmInfo/AE_RobotArmInfo_Backend.h>
+#include <AE_RobotArmInfo/AE_RobotArmInfo_TBM.h>
+
 
 MAV_TYPE GCS_Rover::frame_type() const
 {
@@ -191,16 +195,33 @@ void GCS_MAVLINK_Rover::send_rangefinder() const
     //         chan,
     //         incli_backend->get_roll_deg_from_location(Boom),
     //         incli_backend->get_yaw_deg_from_location(Boom));
+
 /////////////////////////////////////////////////////////////////
-    AE_SlewingEncoder *slewingEncoder = AE_SlewingEncoder::get_singleton();
-    if (slewingEncoder == nullptr) {
+    AE_RobotArmInfo *armInfo = AE_RobotArmInfo::get_singleton();
+    if(armInfo == nullptr) {
+        return;
+    }
+    AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)(armInfo->backend());
+    if (arminfo_backend == nullptr) {
         return;
     }
 
+    AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
+
     mavlink_msg_rangefinder_send(
             chan,
-            degrees(slewingEncoder->get_angle_deg_diff_base2arm_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING)),
-            slewingEncoder->get_full_turns_counts_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING));
+            state_tbm.cutheader_horizon_pos,
+            state_tbm.cutheader_height);
+/////////////////////////////////////////////////////////////////
+    // AE_SlewingEncoder *slewingEncoder = AE_SlewingEncoder::get_singleton();
+    // if (slewingEncoder == nullptr) {
+    //     return;
+    // }
+
+    // mavlink_msg_rangefinder_send(
+    //         chan,
+    //         degrees(slewingEncoder->get_angle_deg_diff_base2arm_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING)),
+    //         slewingEncoder->get_full_turns_counts_loc(AE_SlewingEncoder::Install_Location::INSTALL_SLEWING));
 }
 
 /*

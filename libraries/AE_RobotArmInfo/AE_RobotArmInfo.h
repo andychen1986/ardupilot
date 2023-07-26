@@ -14,6 +14,7 @@ class AE_RobotArmInfo
 {
     // declare backends as friends
     friend class AE_RobotArmInfo_Backend;
+    friend class AE_RobotArmInfo_TBM;
 
 public:
     AE_RobotArmInfo();
@@ -112,6 +113,8 @@ public:
 
     // return true if the backend calculated result is healthy
     bool is_healthy() const { return _backend_state.flags.healthy; }
+
+    AE_RobotArmInfo_Backend* backend() const { return _backend; }
 
     //get the cutting header state at base's body frame
     // AE_RobotArmInfo_TBM::TBM_Cutting_Header_State get_TBM_cutting_header_state() const { return _cutting_header_state; }

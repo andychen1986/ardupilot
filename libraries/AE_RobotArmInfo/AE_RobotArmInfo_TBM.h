@@ -3,6 +3,8 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Inclination/AP_Inclination.h>
 #include <AE_SlewingEncoder/AE_SlewingEncoder.h>
+#include <Filter/Filter.h>                     // Filter library
+#include <Filter/LowPassFilter.h>      // LowPassFilter class (inherits from Filter class)
 #include "AE_RobotArmInfo_Backend.h"
 #include "AE_RobotArmInfo.h"
 
@@ -24,7 +26,14 @@ class AE_RobotArmInfo_TBM : public AE_RobotArmInfo_Backend
 
 public:
     // Constructor
-    using AE_RobotArmInfo_Backend::AE_RobotArmInfo_Backend;
+    AE_RobotArmInfo_TBM(const AE_RobotArmInfo& frontend, AE_RobotArmInfo::Robot_Arm_State& state) :
+        AE_RobotArmInfo_Backend(frontend, state) 
+    {
+        low_pass_filter_vertical_vel.reset(0);
+        low_pass_filter_horizon_vel.reset(0);
+        low_pass_filter_vertical_vel.set_cutoff_frequency(1.0f);
+        low_pass_filter_horizon_vel.set_cutoff_frequency(1.0f);
+    }
 
     // perform any required initialisation of backend
     void init() override;
@@ -64,6 +73,9 @@ private:
 
     TBM_Cutting_Header_State _cuthead_state;
     Back_Support_Leg_State _back_leg_state;
+
+    LowPassFilterFloat low_pass_filter_vertical_vel;
+    LowPassFilterFloat low_pass_filter_horizon_vel;
 
     void Write_TBM_CutheadInfo();
     
