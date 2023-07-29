@@ -31,6 +31,8 @@ protected:
     void send_nav_controller_output() const override;
     void send_pid_tuning() override;
 
+    void send_tbmPosParams(void) const;
+
 private:
 
     void handleMessage(const mavlink_message_t &msg) override;

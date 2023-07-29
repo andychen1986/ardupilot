@@ -181,10 +181,10 @@ void GCS_MAVLINK::send_power_status(void)
         // avoid unnecessary errors being reported to user
         return;
     }
-    mavlink_msg_power_status_send(chan,
-                                  hal.analogin->board_voltage() * 1000,
-                                  hal.analogin->servorail_voltage() * 1000,
-                                  hal.analogin->power_status_flags());
+        mavlink_msg_power_status_send(chan,
+                                hal.analogin->board_voltage() * 1000,
+                                hal.analogin->servorail_voltage() * 1000,
+                                hal.analogin->power_status_flags());
 }
 
 #if HAL_WITH_MCU_MONITORING
@@ -834,6 +834,7 @@ ap_message GCS_MAVLINK::mavlink_id_to_ap_message_id(const uint32_t mavlink_id) c
         uint32_t mavlink_id;
         ap_message msg_id;
     } map[] {
+        { MAVLINK_MSG_ID_TBM_POSITIONAL_PARAMETERS, MSG_TBM_POSITIONAL_PARAMETERS},
         { MAVLINK_MSG_ID_HEARTBEAT,             MSG_HEARTBEAT},
         { MAVLINK_MSG_ID_ATTITUDE,              MSG_ATTITUDE},
         { MAVLINK_MSG_ID_ATTITUDE_QUATERNION,   MSG_ATTITUDE_QUATERNION},
@@ -5140,11 +5141,17 @@ void GCS_MAVLINK::send_received_message_deprecation_warning(const char * message
     send_text(MAV_SEVERITY_WARNING, "Received message (%s) is deprecated", message);
 }
 
+
+
 bool GCS_MAVLINK::try_send_message(const enum ap_message id)
 {
     bool ret = true;
 
     switch(id) {
+    // case MSG_TBM_POSITIONAL_PARAMETERS:
+    //     CHECK_PAYLOAD_SIZE(TBM_POSITIONAL_PARAMETERS);
+    //     send_tbmPosParams();
+    //     break;
 
     case MSG_ATTITUDE:
         CHECK_PAYLOAD_SIZE(ATTITUDE);

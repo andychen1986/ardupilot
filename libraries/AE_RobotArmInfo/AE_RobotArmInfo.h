@@ -128,6 +128,8 @@ public:
     // parameter var table
     static const struct AP_Param::GroupInfo var_info[];   
 
+    AP_Enum<Type> get_type(void) const {return _type;}
+
 private:
 
     // backend state

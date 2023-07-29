@@ -197,21 +197,21 @@ void GCS_MAVLINK_Rover::send_rangefinder() const
     //         incli_backend->get_yaw_deg_from_location(Boom));
 
 /////////////////////////////////////////////////////////////////
-    AE_RobotArmInfo *armInfo = AE_RobotArmInfo::get_singleton();
-    if(armInfo == nullptr) {
-        return;
-    }
-    AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)(armInfo->backend());
-    if (arminfo_backend == nullptr) {
-        return;
-    }
+    // AE_RobotArmInfo *armInfo = AE_RobotArmInfo::get_singleton();
+    // if(armInfo == nullptr) {
+    //     return;
+    // }
+    // AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)(armInfo->backend());
+    // if (arminfo_backend == nullptr) {
+    //     return;
+    // }
 
-    AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
+    // AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
 
-    mavlink_msg_rangefinder_send(
-            chan,
-            state_tbm.cutheader_horizon_pos,
-            state_tbm.cutheader_height);
+    // mavlink_msg_rangefinder_send(
+    //         chan,
+    //         state_tbm.cutheader_horizon_pos,
+    //         state_tbm.cutheader_height);
 /////////////////////////////////////////////////////////////////
     // AE_SlewingEncoder *slewingEncoder = AE_SlewingEncoder::get_singleton();
     // if (slewingEncoder == nullptr) {
@@ -369,10 +369,24 @@ bool GCS_Rover::vehicle_initialised() const
     return rover.control_mode != &rover.mode_initializing;
 }
 
+void GCS_MAVLINK_Rover::send_tbmPosParams(void) const
+{
+    //
+    if((AE_RobotArmInfo::Type)(rover.g2.rbt_arm_info.get_type().get()) == (AE_RobotArmInfo::Type::TBM))
+    {
+        Vector2f tbm_pos = ((AE_RobotArmInfo_TBM *)(rover.g2.rbt_arm_info.backend()))->get_rdHeader_pos();
+        mavlink_msg_tbm_positional_parameters_send(chan, tbm_pos.x, tbm_pos.y, 1, 1, 1);
+    }
+}
+
 // try to send a message, return false if it won't fit in the serial tx buffer
 bool GCS_MAVLINK_Rover::try_send_message(enum ap_message id)
 {
     switch (id) {
+    case MSG_TBM_POSITIONAL_PARAMETERS:
+        CHECK_PAYLOAD_SIZE(TBM_POSITIONAL_PARAMETERS);
+        send_tbmPosParams();
+        break;
 
     case MSG_SERVO_OUT:
         CHECK_PAYLOAD_SIZE(RC_CHANNELS_SCALED);
@@ -557,6 +571,7 @@ static const ap_message STREAM_EXTRA1_msgs[] = {
     MSG_SIMSTATE,
     MSG_AHRS2,
     MSG_PID_TUNING,
+    MSG_TBM_POSITIONAL_PARAMETERS,
 };
 static const ap_message STREAM_EXTRA2_msgs[] = {
     MSG_VFR_HUD

@@ -64,12 +64,15 @@ public:
     //update the cutting header state at base's body frame
     // void  AP_TBM_Info::update_TBM_cutting_header_state(const Vector3f &boom_atti_deg);
 
+    //Get cutting head position
+    Vector2f get_rdHeader_pos(void);
+
 private:
 
     float _dt;
     uint64_t _last_t_us;
-    float _cutting_header_height_last;
-    float _cutting_header_hor_last;
+    float _cutting_header_height_last = 10;
+    float _cutting_header_hor_last = 10;
 
     TBM_Cutting_Header_State _cuthead_state;
     Back_Support_Leg_State _back_leg_state;

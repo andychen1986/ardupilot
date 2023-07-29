@@ -182,5 +182,10 @@ void AE_RobotArmInfo_TBM::Write_TBM_CutheadInfo()
                        (float)_cuthead_state.cutheader_horizon_vel);
 }
 
+Vector2f AE_RobotArmInfo_TBM::get_rdHeader_pos(void)
+{
+    return Vector2f(_cutting_header_hor_last,
+                    _cutting_header_height_last);
+}
 
 
