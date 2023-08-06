@@ -72,6 +72,8 @@ public:
 
     void set_cmd_total(uint8_t num);
 
+    bool is_last_wp();
+
     // mission state enumeration
     enum mission_state {
         MISSION_STOPPED=0,

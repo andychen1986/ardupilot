@@ -114,6 +114,9 @@ COMMON_VEHICLE_DEPENDENT_LIBRARIES = [
     'AP_FETtecOneWire',
     'AP_Torqeedo',
     'AE_Mission_Arm',
+    'AE_Control_Arm',
+    'AE_Navigation_Arm',
+    'AE_WPNav_Arm'
 ]
 
 def get_legacy_defines(sketch_name, bld):

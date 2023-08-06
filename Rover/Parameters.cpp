@@ -696,6 +696,18 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @RebootRequired: True
     AP_GROUPINFO("CON_TYPE", 55, ParametersG2, AE_type, 0),
 
+    // @Group: AWP_
+    // @Path: ../libraries/AE_WPNav_Arm/AE_WPNav_Arm.cpp
+    AP_SUBGROUPINFO(wp_nav_arm, "AWP_", 56, ParametersG2, AE_WPNav_Arm),
+
+    // @Group: APC_
+    // @Path: ../libraries/AE_Control_Arm/AE_PosControl_Arm.cpp
+    AP_SUBGROUPINFO(arm_pos_controller, "APC_", 57, ParametersG2, AE_PosControl_Arm),
+
+    // @Group: ANAV_
+    // @Path: ../libraries/AE_Navigation_Arm/AE_Linear_Nav_Arm.cpp
+    AP_SUBGROUPINFO(arm_nav, "ANAV_", 58, ParametersG2, AE_Linear_Nav_Arm),
+
     AP_GROUPEND
 };
 
@@ -747,6 +759,8 @@ ParametersG2::ParametersG2(void)
     follow(),
     windvane(),
     wp_nav(attitude_control, rover.L1_controller),
+    arm_pos_controller(rover.G_Dt),
+    wp_nav_arm(arm_pos_controller, arm_nav),
     sailboat()
 {
     AP_Param::setup_object_defaults(this, var_info);

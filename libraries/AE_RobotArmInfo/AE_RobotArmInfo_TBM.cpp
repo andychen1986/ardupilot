@@ -124,6 +124,7 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
 
     // slewing deg while cutting head is in mid deg=0,should use information from encoder but now use inclination
     slewing_to_body = slewingencoder->get_angle_deg_diff_base2arm_loc(slewingencoder->INSTALL_SLEWING);
+    // slewing_to_body = radians(_inclination->yaw_deg_location(Boom));
     _cuthead_state.cutheader_height =  get_tbm_param()._mm_CF*sinf(boom_to_body) + get_tbm_param()._mm_JL;
     _cuthead_state.cutheader_horizon_pos = sinf(slewing_to_body)*(get_tbm_param()._mm_CF*cosf(boom_to_body) + get_tbm_param()._mm_JC);
 

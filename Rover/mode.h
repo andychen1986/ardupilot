@@ -6,6 +6,7 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_Mission/AP_Mission.h>
 #include <AR_WPNav/AR_WPNav.h>
+#include <AE_WPNav_Arm/AE_WPNav_Arm.h>
 #include <AE_Mission_Arm/AE_Mission_Arm.h>
 
 #include "defines.h"
@@ -248,18 +249,22 @@ public:
 class ModeDig : public Mode
 {
 public:
-    // attributes of the mode
-    bool is_autopilot_mode() const override { return true; }
+    bool is_autopilot_mode() const override { return false; }
+    bool attitude_stabilized() const override { return false; }
+    bool requires_position() const override { return false; }
+    bool requires_velocity() const override { return false; }
 
-    // methods that affect movement of the vehicle in this mode
+    // methods that affect movement of the arm in this mode
     void update() override;
+
+    virtual void stop_arm() = 0;
 
     AE_Mission_Arm mission{
         FUNCTOR_BIND_MEMBER(&ModeDig::_start_command, bool, const RobotArmLocation&),
         FUNCTOR_BIND_MEMBER(&ModeDig::_verify_command_callback, bool, const RobotArmLocation&),
         FUNCTOR_BIND_MEMBER(&ModeDig::_exit_mission, void)};
 
-    bool waiting_to_start;  // true if waiting for EKF origin before starting mission
+    bool waiting_to_start;  // true if waiting for origin before starting mission
 
 protected:
     bool _enter() override;
@@ -277,6 +282,14 @@ protected:
     virtual void exit_mission() = 0;
     virtual bool verify_command_callback(const RobotArmLocation& cmd) = 0;
 
+    virtual void set_submode() = 0;
+    virtual bool do_nav_wp(const RobotArmLocation& cmd) = 0;
+
+    // high level call to navigate to waypoint
+    virtual void navigate_to_arm_waypoint() = 0;
+
+    bool _is_last;
+
 private:
     bool _start_command(const RobotArmLocation& cmd);
     void _exit_mission();
@@ -289,6 +302,8 @@ public:
     uint32_t mode_number() const override { return TBM; }
     const char *name4() const override { return "TBM"; }
 
+    void stop_arm() override;
+
 protected:
     bool __enter() override;
     void __exit() override;
@@ -296,6 +311,18 @@ protected:
     bool start_command(const RobotArmLocation& cmd) override;
     void exit_mission() override;
     bool verify_command_callback(const RobotArmLocation& cmd) override;
+
+    void set_submode() override;
+    bool do_nav_wp(const RobotArmLocation& cmd) override;
+
+    // high level call to navigate to waypoint
+    void navigate_to_arm_waypoint() override;
+
+private:
+    void calc_boom(float target_speed);
+    void calc_rotation(float turn_rate);
+
+    void convert_wp(RobotArmLocation& cmd);
 };
 
 class ModeAuto : public Mode

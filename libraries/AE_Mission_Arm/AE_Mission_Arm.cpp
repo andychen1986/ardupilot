@@ -259,6 +259,13 @@ void AE_Mission_Arm::set_cmd_total(uint8_t num)
     _cmd_total.set_and_save(num);
 }
 
+bool AE_Mission_Arm::is_last_wp()
+{
+    RobotArmLocation cmd;
+    
+    return !get_next_cmd(_current_index+1, cmd);
+}
+
 // singleton instance
 AE_Mission_Arm *AE_Mission_Arm::_singleton;
 

@@ -16,10 +16,15 @@ bool ModeDig::_enter()
         return false;
     }
 
+    // initialise waypoint speed
+    g2.wp_nav_arm.set_desired_vel_to_default();
+
     mission.set_cmd_total(g2.rbtarmwp.get_rbtarm_waypoint_total());
 
     // set flag to start mission
     waiting_to_start = true;
+
+    _is_last = false;
 
     return true;
 }
@@ -38,7 +43,15 @@ void ModeDig::update()
     switch (_dig_submode) {
     case Dig_TBM: {
         // nav to target loc (tbm)
-        // ...
+        if (!g2.wp_nav_arm.reached_destination()) {
+            // update navigation controller
+            navigate_to_arm_waypoint();
+        } else {
+            if(_is_last) {
+                stop_arm();      
+            }
+        }
+
         break;
     }
     case Dig_Excavator: {
@@ -55,7 +68,11 @@ bool ModeDig::_start_command(const RobotArmLocation& cmd)
 {
     bool ret = false;
 
+    ret |= do_nav_wp(cmd);
+    
     ret |= start_command(cmd);
+
+    set_submode();
 
     gcs().send_text(MAV_SEVERITY_INFO, "Mode%s::start_command()\n", name4());
 
@@ -73,10 +90,12 @@ bool ModeDig::_verify_command_callback(const RobotArmLocation& cmd)
 {
     bool ret = false;
 
-    gcs().send_text(MAV_SEVERITY_INFO, "reached_destination ?\n");
-    gcs().send_text(MAV_SEVERITY_INFO, ".......................\n");
-
     ret |= verify_command_callback(cmd);
+
+    // if(_is_last && ret)
+    // {
+    //     rover.set_mode(rover.mode_auto, ModeReason::GCS_COMMAND);
+    // }
 
     return ret;
 }

@@ -9,6 +9,9 @@
 #include "AP_Rally.h"
 #include "AP_RobotArmWP.h"
 #include "AP_Torqeedo/AP_Torqeedo.h"
+#include <AE_WPNav_Arm/AE_WPNav_Arm.h>
+#include <AE_Control_Arm/AE_PosControl_Arm.h>
+#include <AE_Navigation_Arm/AE_Linear_Nav_Arm.h>
 
 // Global parameter class.
 //
@@ -407,6 +410,12 @@ public:
 
     // waypoint navigation
     AR_WPNav wp_nav;
+
+    // arm navigation
+    AE_WPNav_Arm wp_nav_arm;
+
+    AE_PosControl_Arm arm_pos_controller;
+    AE_Linear_Nav_Arm arm_nav;
 
     // Sailboat functions
     Sailboat sailboat;

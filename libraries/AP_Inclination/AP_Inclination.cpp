@@ -106,8 +106,10 @@ void Inclination::update(void)
 
     //if AP_Inclination_3HDA436Ts_Serial is used, then update the other 2 drivers state by hand.
     if ((Type)params[0].type.get() == Type::three_HDA436Ts_Serial) {
-        state[1] = state[0];
-        state[2] = state[0];
+        for(uint8_t i=1; i<INCLINATION_MAX_INSTANCES; i++)
+        {
+            state[i] = state[0];
+        }
     }
 
 #if HAL_LOGGING_ENABLED
@@ -149,9 +151,10 @@ void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
 
     case Type::three_HDA436Ts_Serial:
         if (AP_Inclination_3HDA436Ts_Serial::detect(serial_instance)) {
-            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance], params[instance]), instance, serial_instance++);
-            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance+1], params[instance+1]), instance+1, serial_instance++);
-            _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[instance+2], params[instance+2]), instance+2, serial_instance++);
+            for(uint8_t i=instance; i<INCLINATION_MAX_INSTANCES; i++)
+            {
+                _add_backend(new AP_Inclination_3HDA436Ts_Serial(state[i], params[i]), i, serial_instance++);
+            }
         }
         break;
 

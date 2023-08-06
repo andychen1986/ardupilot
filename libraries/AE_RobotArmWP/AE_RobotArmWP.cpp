@@ -90,6 +90,59 @@ bool AE_RobotArmWP::set_rbtarm_waypoint_with_index(uint8_t i, const RobotArmLoca
     return true;
 }
 
+// return bearing in radians from loc1 to loc2, return is 0 to 2*Pi
+ftype AE_RobotArmWP::get_bearing(const RobotArmLocation &loc1, const RobotArmLocation &loc2)
+{
+    const int32_t off_x = loc2.xhorizontal - loc1.xhorizontal;
+    const int32_t off_y = loc2.yvertical - loc1.yvertical;
+    ftype bearing = (M_PI*0.5) + atan2F(-off_y, off_x);
+    if (bearing < 0) {
+        bearing += 2*M_PI;
+    }
+    return bearing;
+}
+
+ftype AE_RobotArmWP::get_distance(const RobotArmLocation &loc1, const RobotArmLocation &loc2)
+{
+    ftype dx = (ftype)(loc2.xhorizontal - loc1.xhorizontal);
+    ftype dy = (ftype)(loc2.yvertical - loc1.yvertical);
+    return norm(dx, dy);
+}
+
+// see if location is past a line perpendicular to
+// the line between point1 and point2 and passing through point2.
+// If point1 is our previous waypoint and point2 is our target waypoint
+// then this function returns true if we have flown past
+// the target waypoint
+bool AE_RobotArmWP::past_interval_finish_line(const RobotArmLocation &current_loc, const RobotArmLocation &point1, const RobotArmLocation &point2)
+{
+    return line_path_proportion(current_loc, point1, point2) >= 1.0f;
+}
+
+/*
+  return the proportion we are along the path from point1 to
+  point2, along a line parallel to point1<->point2.
+
+  This will be more than 1 if we have passed point2
+ */
+float AE_RobotArmWP::line_path_proportion(const RobotArmLocation &current_loc, const RobotArmLocation &point1, const RobotArmLocation &point2)
+{
+    const Vector2f vec1 = AE_RobotArmWP::get_distance_NE(point1, point2);
+    const Vector2f vec2 = AE_RobotArmWP::get_distance_NE(point1, current_loc);
+    const ftype dsquared = sq(vec1.x) + sq(vec1.y);
+    if (dsquared < 0.001f) {
+        // the two points are very close together
+        return 1.0f;
+    }
+    return (vec1 * vec2) / dsquared;
+}
+
+Vector2f AE_RobotArmWP::get_distance_NE(const RobotArmLocation &loc1, const RobotArmLocation &loc2)
+{
+    return Vector2f(loc2.yvertical - loc1.yvertical,
+                    loc2.xhorizontal - loc1.xhorizontal);
+}
+
 // singleton instance
 AE_RobotArmWP *AE_RobotArmWP::_singleton;
 

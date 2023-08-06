@@ -119,6 +119,7 @@ public:
     friend class ModeFollow;
     friend class ModeSimple;
     friend class ModeTBN;
+    friend class ModeDig;
 
     friend class RC_Channel_Rover;
     friend class RC_Channels_Rover;

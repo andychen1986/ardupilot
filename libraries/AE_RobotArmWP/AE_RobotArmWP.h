@@ -21,12 +21,22 @@
 
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
+#include <AP_Math/AP_Math.h>
 
 struct PACKED RobotArmLocation {
     float xhorizontal;          //Horizontal position of cutting_head/bucket_tip in rear view (relatively in the range 0-1)
     float yvertical;          //Vertical position of cutting_head/bucket_tip in rear view (relatively in the range 0-1)
     float zalt;        //The altitude of the cutting_head/bucket_tip in meters (relatively);
     float flags;      //reserve
+
+    Vector2f xy() {
+        return Vector2f(xhorizontal, yvertical);
+    }
+
+    void set_xy(Vector2f xy) {
+        xhorizontal = xy.x;
+        yvertical = xy.y;
+    }
 };
 
 /// @class    AE_RobotArmWP
@@ -75,6 +85,32 @@ public:
         return _singleton;
     }
 
+    // return bearing in radians from loc1 to loc2, return is 0 to 2*Pi
+    static ftype get_bearing(const RobotArmLocation &loc1, const RobotArmLocation &loc2);
+
+    // return bearing in centi-degrees from location to loc2, return is 0 to 35999
+    static int32_t get_bearing_to(const RobotArmLocation &loc1, const RobotArmLocation &loc2) {
+        return int32_t(get_bearing(loc1, loc2) * DEGX100 + 0.5);
+    }
+    // return distance in meters between two locations
+    static ftype get_distance(const RobotArmLocation &loc1, const RobotArmLocation &loc2);
+
+    // see if location is past a line perpendicular to
+    // the line between point1 and point2 and passing through point2.
+    // If point1 is our previous waypoint and point2 is our target waypoint
+    // then this function returns true if we have flown past
+    // the target waypoint
+    static bool past_interval_finish_line(const RobotArmLocation &current_loc, const RobotArmLocation &point1, const RobotArmLocation &point2);
+
+    /*
+    return the proportion we are along the path from point1 to
+    point2, along a line parallel to point1<->point2.
+
+    This will be more than 1 if we have passed point2
+    */
+    static float line_path_proportion(const RobotArmLocation &current_loc, const RobotArmLocation &point1, const RobotArmLocation &point2);
+
+    static Vector2f get_distance_NE(const RobotArmLocation &loc1, const RobotArmLocation &loc2);
 
 private:
     static AE_RobotArmWP *_singleton;

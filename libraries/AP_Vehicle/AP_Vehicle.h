@@ -96,6 +96,8 @@ public:
     // parameters for example.
     void notify_no_such_mode(uint8_t mode_number);
 
+    float get_dt() { return G_Dt; }
+
     /*
       common parameters for fixed wing aircraft
      */
