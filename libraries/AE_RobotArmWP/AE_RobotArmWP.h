@@ -22,12 +22,20 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Param/AP_Param.h>
 #include <AP_Math/AP_Math.h>
+#include <AP_Math/vectorN.h>
 
 struct PACKED RobotArmLocation {
     float xhorizontal;          //Horizontal position of cutting_head/bucket_tip in rear view (relatively in the range 0-1)
     float yvertical;          //Vertical position of cutting_head/bucket_tip in rear view (relatively in the range 0-1)
     float zalt;        //The altitude of the cutting_head/bucket_tip in meters (relatively);
     float flags;      //reserve
+
+    void zero() {
+        xhorizontal = 0;
+        yvertical = 0;
+        zalt = 0;
+        flags = 0;
+    }
 
     Vector2f xy() {
         return Vector2f(xhorizontal, yvertical);
@@ -36,6 +44,14 @@ struct PACKED RobotArmLocation {
     void set_xy(Vector2f xy) {
         xhorizontal = xy.x;
         yvertical = xy.y;
+    }
+
+    RobotArmLocation& operator =(const VectorN<float, 4>& v) {
+        xhorizontal = v[0];
+        yvertical = v[1];
+        zalt = v[2];
+
+        return *this;
     }
 };
 

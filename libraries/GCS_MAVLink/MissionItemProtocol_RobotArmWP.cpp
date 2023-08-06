@@ -67,7 +67,7 @@ MAV_MISSION_RESULT MissionItemProtocol_RobotArmWP::convert_MISSION_ITEM_INT_to_R
     if (!(abs(cmd.param3)<=1)) {
         return MAV_MISSION_INVALID_PARAM7;
     }
-    ret = {};
+    ret.zero();
     ret.xhorizontal = cmd.param1;
     ret.yvertical   = cmd.param2;
     ret.zalt        = cmd.param3;

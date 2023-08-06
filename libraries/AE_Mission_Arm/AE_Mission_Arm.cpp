@@ -218,7 +218,7 @@ bool AE_Mission_Arm::read_cmd_from_storage(uint16_t index, RobotArmLocation& cmd
     }
 
     // ensure all bytes of cmd are zeroed
-    cmd = {};
+    cmd.zero();
 
     const uint16_t pos_in_storage = index * AE_Mission_Arm_EEPROM_COMMAND_SIZE;
 

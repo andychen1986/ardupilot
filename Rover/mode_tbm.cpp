@@ -1,5 +1,7 @@
 #include "mode.h"
 #include "Rover.h"
+#include <AP_Math/matrixN.h>
+#include <AP_Math/vectorN.h>
 
 bool ModeTBM::__enter()
 {
@@ -94,8 +96,23 @@ void ModeTBM::stop_arm()
     g2.arm_motors.set_rotation(0);
 }
 
+#define xscale 450
+#define yscale 350
+// 坐标转换，变换为在gcs中以底边的中间为原点，向右为x轴，向上为y轴
 void ModeTBM::convert_wp(RobotArmLocation& cmd)
 {
-    cmd.xhorizontal *= 350;
-    cmd.yvertical *= 350;
+    float tmp_loc[4] = {cmd.xhorizontal*xscale, cmd.yvertical*yscale, cmd.zalt, 1.0f};
+    VectorN<float, 4> loc(tmp_loc);
+    
+    float tmp_tran[4][4] = {
+        1,  0, 0, -xscale/2,
+        0, -1, 0,    yscale,
+        0,  0, 1,         0,
+        0,  0, 0,         1
+    };
+    MatrixN<float, 4> transformation(tmp_tran);
+
+    loc = transformation*loc;
+
+    cmd = loc;
 }
