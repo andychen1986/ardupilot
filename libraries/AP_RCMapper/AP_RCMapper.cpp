@@ -36,7 +36,7 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @Increment: 1
     // @User: Advanced
     // @RebootRequired: True
-    AP_GROUPINFO("YAW",         3, RCMapper, _ch_yaw, 8),
+    AP_GROUPINFO("YAW",         3, RCMapper, _ch_yaw, 15),
 
     // @Param{Rover,Sub}: FORWARD
     // @DisplayName: Forward channel
