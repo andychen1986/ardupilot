@@ -748,7 +748,7 @@ ParametersG2::ParametersG2(void)
 #endif
     beacon(rover.serial_manager),
     motors(rover.ServoRelayEvents, wheel_rate_control),
-    arm_motors(rover.ServoRelayEvents),
+    arm_motors(rover.ServoRelayEvents, rbt_arm_info),
     wheel_rate_control(wheel_encoder),
     attitude_control(),
     smart_rtl(),

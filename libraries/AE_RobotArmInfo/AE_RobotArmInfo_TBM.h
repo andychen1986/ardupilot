@@ -64,6 +64,9 @@ public:
     //update the cutting header state at base's body frame
     // void  AP_TBM_Info::update_TBM_cutting_header_state(const Vector3f &boom_atti_deg);
 
+    // get cylinder length state
+    int8_t get_cylinder_length_state(int8_t cylinder_number) override;
+
 private:
 
     float _dt;

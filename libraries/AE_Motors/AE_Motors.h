@@ -2,21 +2,16 @@
 
 //#include <AP_Arming/AP_Arming.h>
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
+#include <AR_Motors/AP_MotorsUGV.h>
+#include <AE_RobotArmInfo/AE_RobotArmInfo_Excavator.h>
 
 class AE_Motors {
 public:
     // Constructor
-    AE_Motors(AP_ServoRelayEvents &relayEvents);
+    AE_Motors(AP_ServoRelayEvents &relayEvents, AE_RobotArmInfo &rbt_arm_info);
 
     // singleton support
     static AE_Motors   *get_singleton(void) { return _singleton; }
-
-    // supported omni motor configurations
-    enum AE_type {
-        FRAME_TYPE_UNDEFINED = 0,
-        FRAME_TYPE_EXCAVATOR = 1,
-        FRAME_TYPE_TBM = 2,
-    };
     
     // initialise motors
     void init(uint8_t contype);
@@ -63,16 +58,6 @@ public:
     // return the motor mask
     uint16_t get_motor_mask() const { return _motor_mask; }
 
-    // structure for holding motor limit flags
-    struct AP_MotorsUGV_limit {
-        uint8_t boom_lower  : 1; // we have reached boom's lower limit
-        uint8_t boom_upper  : 1; // we have reached boom's upper limit
-        uint8_t forearm_lower  : 1; // we have reached forearm's lower limit
-        uint8_t forearm_upper  : 1; // we have reached forearm's upper limit
-        uint8_t bucket_lower  : 1; // we have reached bucket's lower limit
-        uint8_t bucket_upper  : 1; // we have reached bucket's upper limit
-    } limit;
-
     // var_info for holding Parameter information
     static const struct AP_Param::GroupInfo var_info[];
 
@@ -117,6 +102,7 @@ private:
 
     // external references
     AP_ServoRelayEvents &_relayEvents;
+    AE_RobotArmInfo &_rbt_arm_info;
 
     // parameters
     AP_Int8 _pwm_type;  // PWM output type
@@ -130,8 +116,9 @@ private:
     float   _bucket;    // requested bucket as a value from -100 to 100
     float   _throttle_prev; // throttle input from previous iteration
     float   _rotation;  // requested rotation input as a value in the range +- 100
+    AP_Int8 _output_min; // throttle minimum percentage
     uint16_t _motor_mask;   // mask of motors configured with pwm_type
-    AE_type _AE_type; // frame type requested at initialisation
+    AP_MotorsUGV::frame_type _frame_type; // frame type requested at initialisation
 
     static AE_Motors *_singleton;
 };

@@ -27,6 +27,8 @@ public:
         FRAME_TYPE_OMNI3 = 1,
         FRAME_TYPE_OMNIX = 2,
         FRAME_TYPE_OMNIPLUS = 3,
+        FRAME_TYPE_EXCAVATOR = 4,
+        FRAME_TYPE_TBM = 5,
     };
 
     // initialise motors

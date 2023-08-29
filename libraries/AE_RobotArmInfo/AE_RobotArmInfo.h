@@ -73,7 +73,8 @@ public:
     struct Ex_Cylinder_State {
         float length_mm;                        // mm
         float velocity_mms;                     // mm/s
-        float length_max_mm;                    // mm        
+        float length_max_mm;                    // mm 
+        float length_min_mm;                    // mm       
         enum Ex_OC_Name cylinder_name;
     };
 
@@ -104,6 +105,13 @@ public:
         uint8_t healthy : 1; // true if sensor is healthy
     } _flags;
 
+    enum Robot_Arm_Safe_State {
+        SAFETY      = 0,
+        UP_ALERT   = 1,
+        DOWN_ALERT = 2,
+        EMERG  = 3,
+    };
+
     // perform any required initialisation of different arm type
     // update_rate_hz should be the rate at which the update method will be called in hz
     void init(void);
@@ -127,6 +135,9 @@ public:
 
     // parameter var table
     static const struct AP_Param::GroupInfo var_info[];   
+
+    // get cylinder length state
+    int8_t get_cylinder_length_state(int8_t cylinder_number);
 
 private:
 
@@ -157,6 +168,7 @@ private:
     // https://gitee.com/andychen183/roadheader_gcs/issues/I7BLTG
     struct EXCVT_PARAM{
         AP_Float    _cylinder_max[3];       //The maximum stroke of the boom/forearm/bucket oil cylinder
+        AP_Float    _cylinder_min[3];       //The minimum stroke of the boom/forearm/bucket oil cylinder
         AP_Float    _mm_JC;
         AP_Float    _mm_CF;
         AP_Float    _mm_FQ;

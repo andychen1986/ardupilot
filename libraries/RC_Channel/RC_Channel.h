@@ -505,6 +505,10 @@ public:
         return _options & uint32_t(Option::ARMING_SKIP_CHECK_RPY);
     }
 
+    bool arming_skip_checks_bfbr() const {
+        return _options & uint32_t(Option::ARMING_SKIP_CHECK_BFBR);
+    }
+
     bool suppress_crsf_message(void) const {
         return get_singleton() != nullptr && (_options & uint32_t(Option::SUPPRESS_CRSF_MESSAGE));
     }
@@ -581,6 +585,7 @@ protected:
         SUPPRESS_CRSF_MESSAGE   = (1U << 9), // suppress CRSF mode/rate message for ELRS systems
         MULTI_RECEIVER_SUPPORT  = (1U << 10), // allow multiple receivers
         USE_CRSF_LQ_AS_RSSI     = (1U << 11), // returns CRSF link quality as RSSI value, instead of RSSI
+        ARMING_SKIP_CHECK_BFBR   = (1U << 12), // skip the an arming checks for the boom/forearm/bucket/rotation channels
     };
 
     void new_override_received() {

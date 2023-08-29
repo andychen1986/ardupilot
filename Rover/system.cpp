@@ -108,7 +108,9 @@ void Rover::init_ardupilot()
 
     init_rc_in();            // sets up rc channels deadzone
     g2.motors.init(get_frame_type());        // init motors including setting servo out channels ranges
-    g2.arm_motors.init(get_AE_type()); 
+#if AE_RobotArmInfo_ENABLED
+    g2.arm_motors.init(get_frame_type()); 
+#endif
     SRV_Channels::enable_aux_servos();
 
     // init wheel encoders
@@ -320,6 +322,13 @@ bool Rover::should_log(uint32_t mask)
 bool Rover::is_boat() const
 {
     return ((enum frame_class)g2.frame_class.get() == FRAME_BOAT);
+}
+
+// returns true if vehicle is a construction machinery
+// this affects whether the vehicle tries to maintain position after reaching waypoints
+bool Rover::is_construction_machinery() const
+{
+    return ((enum frame_class)g2.frame_class.get() == FRAME_CONSTRUCTION_MACHINERY);
 }
 
 #include <AP_Avoidance/AP_Avoidance.h>

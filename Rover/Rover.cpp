@@ -75,7 +75,9 @@ const AP_Scheduler::Task Rover::scheduler_tasks[] = {
     SCHED_TASK(read_rangefinders,      50,    200,   9),
     SCHED_TASK(update_current_mode,   400,    200,  12),
     SCHED_TASK(set_servos,            400,    200,  15),
+#if AE_RobotArmInfo_ENABLED
     SCHED_TASK(set_AE_servos,       200,  250,  16),
+#endif
     SCHED_TASK_CLASS(AP_GPS,              &rover.gps,              update,         50,  300,  18),
     SCHED_TASK_CLASS(AP_Baro,             &rover.barometer,        update,         10,  200,  21),
     SCHED_TASK_CLASS(AP_Beacon,           &rover.g2.beacon,        update,         50,  200,  24),

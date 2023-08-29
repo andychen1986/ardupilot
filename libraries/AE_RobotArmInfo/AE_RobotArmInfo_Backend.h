@@ -45,6 +45,9 @@ public:
         return _frontend.tbm_param;
     }
 
+    // get cylinder length state
+    virtual int8_t get_cylinder_length_state(int8_t cylinder_number);
+
 protected:
     const AE_RobotArmInfo&  _frontend;          // reference to robot arm info front end
     AE_RobotArmInfo::Robot_Arm_State &_state;   // reference to this instances state

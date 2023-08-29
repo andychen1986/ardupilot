@@ -23,7 +23,7 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Description: AE_RobotArmInfo Type
     // @Values: 0:None, 1:TBM, 2:EXCAVATOR, 3:SITL
     // @User: Advanced
-    AP_GROUPINFO("TYPE",    1, AE_RobotArmInfo, _type, 0),
+    AP_GROUPINFO("TYPE",    1, AE_RobotArmInfo, _type, 2),
 
     // @Param: BOOM_CYLINDER_MAX
     // @DisplayName: Boom cylinder maximum stroke
@@ -32,7 +32,7 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("CLD1_BM_MX",    2, AE_RobotArmInfo, excavtor_param._cylinder_max[0], 260),
+    AP_GROUPINFO("CLD1_BM_MX",    2, AE_RobotArmInfo, excavtor_param._cylinder_max[0], 255),
 
     // @Param: FOREARM_CYLINDER_MAX
     // @DisplayName: Forearm cylinder maximum stroke
@@ -41,7 +41,7 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("CLD2_FM_MX",    3, AE_RobotArmInfo, excavtor_param._cylinder_max[1], 0),
+    AP_GROUPINFO("CLD2_FM_MX",    3, AE_RobotArmInfo, excavtor_param._cylinder_max[1], 285),
 
     // @Param: BOOM_CYLINDER_MAX
     // @DisplayName: Bucket cylinder maximum stroke
@@ -50,7 +50,34 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("CLD3_BK_MX",    4, AE_RobotArmInfo, excavtor_param._cylinder_max[2], 0),
+    AP_GROUPINFO("CLD3_BK_MX",    4, AE_RobotArmInfo, excavtor_param._cylinder_max[2], 240),
+
+    // @Param: BOOM_CYLINDER_MIN
+    // @DisplayName: Boom cylinder minimum stroke
+    // @Description: The minimum stroke of the boom oil cylinder.
+    // @Range: 0 260
+    // @Increment: 0.1
+    // @User: Advanced
+    // @Units: mm
+    AP_GROUPINFO("CLD1_BM_MN",    42, AE_RobotArmInfo, excavtor_param._cylinder_min[0], 175),
+
+    // @Param: FOREARM_CYLINDER_MIN
+    // @DisplayName: Forearm cylinder minimum stroke
+    // @Description: The minimum stroke of the forearm oil cylinder.
+    // @Range: 0 260
+    // @Increment: 0.1
+    // @User: Advanced
+    // @Units: mm
+    AP_GROUPINFO("CLD2_FM_MN",    43, AE_RobotArmInfo, excavtor_param._cylinder_min[1], 170),
+
+    // @Param: BUCKET_CYLINDER_MIN
+    // @DisplayName: Bucket cylinder minimum stroke
+    // @Description: The minimum stroke of the bucket oil cylinder.
+    // @Range: 0 260
+    // @Increment: 0.1
+    // @User: Advanced
+    // @Units: mm
+    AP_GROUPINFO("CLD3_BK_MN",    44, AE_RobotArmInfo, excavtor_param._cylinder_min[2], 170),
 
     //////////////////////////////////////////
     //Excavator param
@@ -352,6 +379,12 @@ void AE_RobotArmInfo::update()
         last_log_ms = now;
         Write_RobotArmInfo();
     }
+}
+
+// get cylinder length state
+int8_t AE_RobotArmInfo::get_cylinder_length_state(int8_t cylinder_number)
+{
+    return _backend->get_cylinder_length_state(cylinder_number);
 }
 
 void AE_RobotArmInfo::Write_RobotArmInfo()

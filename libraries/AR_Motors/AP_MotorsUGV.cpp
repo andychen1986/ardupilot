@@ -579,6 +579,10 @@ void AP_MotorsUGV::setup_omni()
         add_omni_motor(2, 0.0f, -1.0f, 1.0f);
         add_omni_motor(3, 1.0f, 0.0f, 0.0f);
         break;
+
+    case FRAME_TYPE_EXCAVATOR:
+    case FRAME_TYPE_TBM:
+         break;
     }
 }
 

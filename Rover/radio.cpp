@@ -140,7 +140,7 @@ void Rover::rudder_arm_disarm_check()
             // not at full right rudder
             rudder_arm_timer = 0;
         }
-    } else if ((arming_rudder == AP_Arming::RudderArming::ARMDISARM) && !g2.motors.active() && !g2.arm_motors.active()) {//在excavator禁用摇杆解锁
+    } else if ((arming_rudder == AP_Arming::RudderArming::ARMDISARM) && !g2.motors.active() && !g2.arm_motors.active()) {
         // when armed and motor not active (not moving), full left rudder starts disarming counter
         if (channel_steer->get_control_in() < -4000) {
             const uint32_t now = millis();

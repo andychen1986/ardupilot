@@ -393,6 +393,7 @@ private:
     uint8_t check_digital_pin(uint8_t pin);
     bool should_log(uint32_t mask);
     bool is_boat() const;
+    bool is_construction_machinery() const;
 
     // vehicle specific waypoint info helpers
     bool get_wp_distance_m(float &distance) const override;
@@ -435,7 +436,6 @@ public:
 
     // frame type
     uint8_t get_frame_type() const { return g2.frame_type.get(); }
-    uint8_t get_AE_type() const { return g2.AE_type.get(); }
     AP_WheelRateControl& get_wheel_rate_control() { return g2.wheel_rate_control; }
 
     // Simple mode

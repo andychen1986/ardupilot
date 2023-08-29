@@ -11,9 +11,13 @@ bool AP_Arming_Rover::rc_calibration_checks(const bool display_failure)
 
     const RC_Channel *channels[] = {
         rover.channel_steer,
-        rover.channel_throttle
+        rover.channel_throttle,
+        rover.channel_boom,
+        rover.channel_forearm,
+        rover.channel_bucket,
+        rover.channel_rotation
     };
-    const char *channel_names[] = {"Steer", "Throttle"};
+    const char *channel_names[] = {"Steer", "Throttle","Boom","Forearm","Bucket","Rotation"};
 
     for (uint8_t i= 0 ; i < ARRAY_SIZE(channels); i++) {
         const RC_Channel *channel = channels[i];

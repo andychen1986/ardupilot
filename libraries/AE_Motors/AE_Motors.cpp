@@ -58,20 +58,31 @@ const AP_Param::GroupInfo AE_Motors::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("THST_EXPO", 9, AE_Motors, _thrust_curve_expo, 0.0f),
 
+    // @Param: OUT_MIN
+    // @DisplayName: Output minimum
+    // @Description: Output minimum percentage the autopilot will apply. This is useful for handling a deadzone around low throttle and for preventing internal combustion motors cutting out during missions.
+    // @Units: %
+    // @Range: 0 20
+    // @Increment: 1
+    // @User: Standard
+    AP_GROUPINFO("OUT_MIN", 10, AE_Motors, _output_min, 0),
+
+
     AP_GROUPEND
 };
 
 
-AE_Motors::AE_Motors(AP_ServoRelayEvents &relayEvents) :
-    _relayEvents(relayEvents)
+AE_Motors::AE_Motors(AP_ServoRelayEvents &relayEvents, AE_RobotArmInfo &rbt_arm_info) :
+    _relayEvents(relayEvents),
+    _rbt_arm_info(rbt_arm_info)
 {
     AP_Param::setup_object_defaults(this, var_info);
     _singleton = this;
 }
 
-void AE_Motors::init(uint8_t con_type)
+void AE_Motors::init(uint8_t frtype)
 {
-    _AE_type = AE_type(con_type);
+    _frame_type = AP_MotorsUGV::frame_type(frtype);
 
     // setup servo output
     setup_servo_output();
@@ -188,7 +199,7 @@ void AE_Motors::output(bool armed,  float dt)
     }
 
     // sanity check parameters
-    //sanity_check_parameters();
+    sanity_check_parameters();
 
     if(have_excavator()){
         // output to excavator's boom , forearm , bucket and rotation channels
@@ -201,7 +212,6 @@ void AE_Motors::output(bool armed,  float dt)
 }
 
 //  returns true if checks pass, false if they fail.  report should be true to send text messages to GCS
-//  检查倾角传感器参数是否超限
 bool AE_Motors::pre_arm_check(bool report) const
 {
     if ((SRV_Channels::function_assigned(SRV_Channel::k_boom) ||
@@ -223,7 +233,7 @@ bool AE_Motors::pre_arm_check(bool report) const
 // sanity check parameters
 void AE_Motors::sanity_check_parameters()
 {
-
+    _output_min = constrain_int16(_output_min, 0, 20);
 }
 
 // setup pwm output type
@@ -374,6 +384,29 @@ void AE_Motors::arm_output(SRV_Channel::Aux_servo_function_t function, float arm
 // prevent the boom from exceeding the limit position
 float AE_Motors::prevent_exceeding_position(SRV_Channel::Aux_servo_function_t function, float arm_output)
 {
+    if (function == SRV_Channel::k_rotation){
+        return arm_output;
+    }
+
+    int8_t joint = (int8_t)(function - SRV_Channel::k_boom);
+    int8_t status = _rbt_arm_info.get_cylinder_length_state(joint);
+
+    switch (status) {
+        case AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY:
+            break;
+        
+        case AE_RobotArmInfo::Robot_Arm_Safe_State::DOWN_ALERT:
+            arm_output = constrain_float(arm_output, -100.0f, 0.0f);
+            break;
+        
+        case AE_RobotArmInfo::Robot_Arm_Safe_State::UP_ALERT:
+            arm_output = constrain_float(arm_output, 0.0f, 100.0f);
+            break;
+
+        case AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG:
+            return 0.0;
+    }
+        
     return arm_output;
 }
 
@@ -383,6 +416,15 @@ float AE_Motors::get_scaled_arm_output(float arm_output) const
     // exit immediately if arm_output is zero
     if (is_zero(arm_output)) {
         return arm_output;
+    }
+
+    // scale using output_min
+    if (_output_min > 0) {
+        if (is_negative(arm_output)) {
+            arm_output = -_output_min + (arm_output * ((100.0f - _output_min) / 100.0f));
+        } else {
+            arm_output = _output_min + (arm_output * ((100.0f - _output_min) / 100.0f));
+        }
     }
 
     // skip further scaling if thrust curve disabled or invalid

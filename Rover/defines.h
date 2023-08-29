@@ -102,4 +102,5 @@ enum frame_class {
     FRAME_ROVER = 1,
     FRAME_BOAT = 2,
     FRAME_BALANCEBOT = 3,
+    FRAME_CONSTRUCTION_MACHINERY = 4,
 };

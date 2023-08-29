@@ -183,5 +183,10 @@ void AE_RobotArmInfo_TBM::Write_TBM_CutheadInfo()
                        (float)_cuthead_state.cutheader_horizon_vel);
 }
 
+int8_t AE_RobotArmInfo_TBM::get_cylinder_length_state(int8_t cylinder_number)
+{
+    return AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY;
+}
+
 
 
