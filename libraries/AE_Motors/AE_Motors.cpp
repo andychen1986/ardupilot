@@ -384,6 +384,8 @@ void AE_Motors::arm_output(SRV_Channel::Aux_servo_function_t function, float arm
 // prevent the boom from exceeding the limit position
 float AE_Motors::prevent_exceeding_position(SRV_Channel::Aux_servo_function_t function, float arm_output)
 {
+    const uint32_t now = AP_HAL::millis();
+    static uint32_t emerg_warm_time = now;
     if (function == SRV_Channel::k_rotation){
         return arm_output;
     }
@@ -404,6 +406,10 @@ float AE_Motors::prevent_exceeding_position(SRV_Channel::Aux_servo_function_t fu
             break;
 
         case AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG:
+            if(emerg_warm_time = AP_HAL::millis() > 5000U){
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "Output controller stopped due to unhealthy sensor data!");
+                emerg_warm_time = now;
+            }
             return 0.0;
     }
         

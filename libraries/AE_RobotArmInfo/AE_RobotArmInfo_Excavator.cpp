@@ -191,8 +191,15 @@ void AE_RobotArmInfo_Excavator::adjust_to_body_origin(float euler_boom, float eu
                     - 2 * get_ex_param()._mm_QN * get_ex_param()._mm_MN * cosf(angle_QNM));
     angle_MQN = acosf((distance_QM * distance_QM + get_ex_param()._mm_QN * get_ex_param()._mm_QN - get_ex_param()._mm_MN * get_ex_param()._mm_MN)
                     / (2 * distance_QM * get_ex_param()._mm_QN));
-    angle_MQK = acosf((get_ex_param()._mm_QK * get_ex_param()._mm_QK + distance_QM * distance_QM - get_ex_param()._mm_MK * get_ex_param()._mm_MK)
-                    / (2 * get_ex_param()._mm_QK * get_ex_param()._mm_MK));
+    float middle_angle_MQK = (get_ex_param()._mm_QK * get_ex_param()._mm_QK + distance_QM * distance_QM - get_ex_param()._mm_MK * get_ex_param()._mm_MK)
+                    / (2 * get_ex_param()._mm_QK * get_ex_param()._mm_MK);
+
+    bug_flag_MQK = false;
+    if(middle_angle_MQK >= 0.99999f )
+        bug_flag_MQK = true;
+
+    angle_MQK = acosf(middle_angle_MQK);
+
     angle_DQV = M_2PI - radians(get_ex_param()._deg_NQF) - angle_MQN - angle_MQK - radians(get_ex_param()._deg_KQV);
     bucket_to_body = forearm_to_body + angle_DQV - M_PI;
 
@@ -236,7 +243,7 @@ int8_t AE_RobotArmInfo_Excavator::get_cylinder_length_state(int8_t cylinder_numb
     else if(distance_to_max_mm <= 10.0f )
         return AE_RobotArmInfo::Robot_Arm_Safe_State::UP_ALERT;
 
-    else if(distance_to_min_mm <= 10.0f )
+    else if(distance_to_min_mm <= 10.0f || (cylinder_number == 2 && bug_flag_MQK))
         return AE_RobotArmInfo::Robot_Arm_Safe_State::DOWN_ALERT;
 
     return AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG;

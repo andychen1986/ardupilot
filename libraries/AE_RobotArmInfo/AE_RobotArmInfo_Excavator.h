@@ -50,5 +50,6 @@ private:
     bool update_excavator_struct(void);
     bool check_if_info_valid(struct Excavator_Robot_Arm_State& ex_state);
     void adjust_to_body_origin(float euler_boom, float euler_forearm, float euler_bucket, float &boom_to_body,float &forearm_to_body,float &bucket_to_body); 
+    bool bug_flag_MQK; //In order to avoid the arccos out-of-bounds problem that occurs when the angle MQK is close to the DOWN_ALERT limit
 
 };
