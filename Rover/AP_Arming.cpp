@@ -15,13 +15,17 @@ bool AP_Arming_Rover::rc_calibration_checks(const bool display_failure)
         rover.channel_boom,
         rover.channel_forearm,
         rover.channel_bucket,
-        rover.channel_rotation
+        rover.channel_rotation,
+        rover.channel_cutting_header,
+        rover.channel_support_leg
     };
-    const char *channel_names[] = {"Steer", "Throttle","Boom","Forearm","Bucket","Rotation"};
+    const char *channel_names[] = {"Steer", "Throttle","Boom","Forearm","Bucket","Rotation","Cutting Header","Support Leg"};
 
     for (uint8_t i= 0 ; i < ARRAY_SIZE(channels); i++) {
         const RC_Channel *channel = channels[i];
         const char *channel_name = channel_names[i];
+        if ((enum AE_type)rover.g2.AE_type.get() == EXCAVATOR && ((i == 6) || (i == 7))) continue;
+        if ((enum AE_type)rover.g2.AE_type.get() == TBM && ((i == 3) || (i == 4))) continue;
         // check if radio has been calibrated
         if (channel->get_radio_min() > RC_Channel::RC_CALIB_MIN_LIMIT_PWM) {
             check_failed(ARMING_CHECK_RC, display_failure, "%s radio min too high", channel_name);

@@ -15,6 +15,8 @@ Mode::Mode() :
     channel_forearm(rover.channel_forearm),
     channel_bucket(rover.channel_bucket),
     channel_rotation(rover.channel_rotation),
+    channel_cutting_header(rover.channel_cutting_header),
+    channel_support_leg(rover.channel_support_leg),
     attitude_control(rover.g2.attitude_control)
 { }
 

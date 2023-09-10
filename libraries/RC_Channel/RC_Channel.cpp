@@ -1223,6 +1223,8 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
     case AUX_FUNC::FOREARM:
     case AUX_FUNC::BUCKET:
     case AUX_FUNC::ROTATION:
+    case AUX_FUNC::CUTTING_HEADER:
+    case AUX_FUNC::SUPPORT_LEG:
         break;
 
     default:

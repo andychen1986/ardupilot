@@ -48,6 +48,11 @@ public:
     /// rotation - return input channel number for rotation input
     uint8_t rotation() const { return _ch_rotation; }
 
+    /// cutting_header - return input channel number for cutting_header input
+    uint8_t cutting_header() const { return _ch_cutting_header; }
+
+    /// support_leg - return input channel number for support_leg input
+    uint8_t support_leg() const { return _ch_support_leg; }
 
     static const struct AP_Param::GroupInfo var_info[];
 
@@ -63,6 +68,8 @@ private:
     AP_Int8 _ch_forearm;
     AP_Int8 _ch_bucket;
     AP_Int8 _ch_rotation;
+    AP_Int8 _ch_cutting_header;
+    AP_Int8 _ch_support_leg;
     static RCMapper *_singleton;
 };
 

@@ -92,6 +92,22 @@ const AP_Param::GroupInfo RCMapper::var_info[] = {
     // @RebootRequired: True
     AP_GROUPINFO_FRAME("ROTATION",    9, RCMapper, _ch_rotation, 4, AP_PARAM_FRAME_ROVER ),
 
+    // @Param{Rover,Sub}: CUTTING_HEADER
+    // @DisplayName: Cutting_header channel
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("CUT_HEAD",    10, RCMapper, _ch_cutting_header, 13, AP_PARAM_FRAME_ROVER ),
+
+    // @Param{Rover,Sub}: SUPPORT_LEG
+    // @DisplayName: Support_leg channel
+    // @Range: 1 8
+    // @Increment: 1
+    // @User: Advanced
+    // @RebootRequired: True
+    AP_GROUPINFO_FRAME("SUP_LEG",    11, RCMapper, _ch_support_leg, 14, AP_PARAM_FRAME_ROVER ),
+
     AP_GROUPEND
 };
 

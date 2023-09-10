@@ -1,5 +1,7 @@
 #pragma once
-
+/*
+This library does not support any ESCs and motors other than normal_pwm signals!!!
+*/
 //#include <AP_Arming/AP_Arming.h>
 #include <AP_ServoRelayEvents/AP_ServoRelayEvents.h>
 #include <AR_Motors/AP_MotorsUGV.h>
@@ -8,7 +10,7 @@
 class AE_Motors {
 public:
     // Constructor
-    AE_Motors(AP_ServoRelayEvents &relayEvents, AE_RobotArmInfo &rbt_arm_info);
+    AE_Motors(AE_RobotArmInfo &rbt_arm_info);
 
     // singleton support
     static AE_Motors   *get_singleton(void) { return _singleton; }
@@ -41,6 +43,14 @@ public:
     void set_rotation(float _rotation);
     float get_rotation() const { return _rotation; }
 
+    // set or get cutting_header input as a value from -100 to 100
+    void set_cutting_header(float _cutting_header);
+    float get_cutting_header() const { return _cutting_header; }
+
+    // set or get mast rotation input as a value from -100 to 100
+    void set_support_leg(float _support_leg);
+    float get_support_leg() const { return _support_leg; }
+
     // true if vehicle is capable of excavator
     bool have_excavator() const;
 
@@ -61,31 +71,26 @@ public:
     // var_info for holding Parameter information
     static const struct AP_Param::GroupInfo var_info[];
 
-private:
+    // return the motor mask
+    uint8_t get_construction_type() const{return _con_type;};
 
-    enum pwm_type {
-        PWM_TYPE_NORMAL = 0,
-        PWM_TYPE_ONESHOT = 1,
-        PWM_TYPE_ONESHOT125 = 2,
-        PWM_TYPE_BRUSHED_WITH_RELAY = 3,
-        PWM_TYPE_BRUSHED_BIPOLAR = 4,
-        PWM_TYPE_DSHOT150 = 5,
-        PWM_TYPE_DSHOT300 = 6,
-        PWM_TYPE_DSHOT600 = 7,
-        PWM_TYPE_DSHOT1200 = 8
+    //construction type
+    enum CON_TYPE{
+        UNDEFINED   = 0,
+        EXCAVATOR   = 1,
+        TBM         = 2
     };
+
+private:
 
     // sanity check parameters
     void sanity_check_parameters();
-
-    // setup pwm output type
-    void setup_pwm_type();
 
     // output to excavator's boom , forearm , bucket rotation channels
     void output_excavator(bool armed, float boom, float forearm, float bucket, float rotation);
 
     // output to excavator's boom , forearm and bucket channels
-    void output_TBM(bool armed, float boom, float rotation);
+    void output_TBM(bool armed, float boom, float rotation, float cutting_header, float support_leg);
 
     // arm_output (-100 ~ +100) to a arm channel.  Sets relays if required
     // dt is the main loop time interval and is required when rate control is required
@@ -101,12 +106,9 @@ private:
     float get_rate_controlled_throttle(SRV_Channel::Aux_servo_function_t function, float throttle, float dt); 
 
     // external references
-    AP_ServoRelayEvents &_relayEvents;
     AE_RobotArmInfo &_rbt_arm_info;
 
     // parameters
-    AP_Int8 _pwm_type;  // PWM output type
-    AP_Int8 _pwm_freq;  // PWM output freq for brushed motors
     AP_Int8 _disarm_disable_pwm;    // disable PWM output while disarmed
     AP_Float _thrust_curve_expo; // thrust curve exponent from -1 to +1 with 0 being linear
 
@@ -115,10 +117,12 @@ private:
     float   _forearm;   // requested forearm as a value from -100 to 100
     float   _bucket;    // requested bucket as a value from -100 to 100
     float   _throttle_prev; // throttle input from previous iteration
-    float   _rotation;  // requested rotation input as a value in the range +- 100
+    float   _rotation;  // requested rotation input as a value from -100 to 100
+    float   _support_leg;  // requested support_leg input as a value from -100 to 100
+    float   _cutting_header;  // requested cutting_header input as a value from -100 to 100
     AP_Int8 _output_min; // throttle minimum percentage
     uint16_t _motor_mask;   // mask of motors configured with pwm_type
-    AP_MotorsUGV::frame_type _frame_type; // frame type requested at initialisation
+    CON_TYPE _con_type; // frame type requested at initialisation
 
     static AE_Motors *_singleton;
 };

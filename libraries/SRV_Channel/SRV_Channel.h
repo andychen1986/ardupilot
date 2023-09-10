@@ -162,6 +162,8 @@ public:
         k_forearm               = 112,
         k_bucket                = 113,
         k_rotation              = 114,
+        k_cutting_header        = 115,
+        k_support_leg           = 116,
         k_LED_neopixel1         = 120,
         k_LED_neopixel2         = 121,
         k_LED_neopixel3         = 122,

@@ -102,5 +102,11 @@ enum frame_class {
     FRAME_ROVER = 1,
     FRAME_BOAT = 2,
     FRAME_BALANCEBOT = 3,
-    FRAME_CONSTRUCTION_MACHINERY = 4,
+};
+
+// frame class enum used for AE_TYPE parameter
+enum AE_type {
+    UNDEFINED = 0,
+    EXCAVATOR = 1,
+    TBM = 2,
 };

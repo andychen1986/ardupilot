@@ -13,6 +13,8 @@ void Rover::set_control_channels(void)
     channel_forearm  = rc().channel(rcmap.forearm()-1);
     channel_bucket  = rc().channel(rcmap.bucket()-1);
     channel_rotation  = rc().channel(rcmap.rotation()-1);
+    channel_cutting_header = rc().channel(rcmap.cutting_header()-1);
+    channel_support_leg = rc().channel(rcmap.support_leg()-1);
 
     // set rc channel ranges
     channel_steer->set_angle(SERVO_MAX);
@@ -31,6 +33,12 @@ void Rover::set_control_channels(void)
     }
     if (channel_rotation != nullptr) {
         channel_rotation->set_angle(100);
+    }
+    if (channel_cutting_header != nullptr) {
+        channel_cutting_header->set_angle(100);
+    }
+    if (channel_support_leg != nullptr) {
+        channel_support_leg->set_angle(100);
     }
 
     // walking robots rc input init
@@ -72,6 +80,8 @@ void Rover::set_control_channels(void)
     g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_forearm);
     g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_bucket);
     g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_rotation);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_cutting_header);
+    g2.servo_channels.set_esc_scaling_for(SRV_Channel::k_support_leg);
 }
 
 void Rover::init_rc_in()
@@ -93,6 +103,12 @@ void Rover::init_rc_in()
     }
     if (channel_rotation != nullptr) {
         channel_rotation->set_default_dead_zone(30);
+    }
+    if (channel_cutting_header != nullptr) {
+        channel_cutting_header->set_default_dead_zone(30);
+    }
+    if (channel_support_leg != nullptr) {
+        channel_support_leg->set_default_dead_zone(30);
     }
 }
 

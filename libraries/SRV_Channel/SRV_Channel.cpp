@@ -244,6 +244,8 @@ bool SRV_Channel::should_e_stop(SRV_Channel::Aux_servo_function_t function)
     case Aux_servo_function_t::k_forearm:
     case Aux_servo_function_t::k_bucket:
     case Aux_servo_function_t::k_rotation:
+    case Aux_servo_function_t::k_cutting_header:
+    case Aux_servo_function_t::k_support_leg:
         return true;
     default:
         return false;

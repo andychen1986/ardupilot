@@ -26,37 +26,20 @@ AE_Motors *AE_Motors::_singleton;
 // parameters for the motor class 
 // first part have 6 letters!!!!!!!!! can only add other 10
 const AP_Param::GroupInfo AE_Motors::var_info[] = {
-    // @Param: PWM_TYPE
-    // @DisplayName: Motor Output PWM type
-    // @Description: This selects the output PWM type as regular PWM, OneShot, Brushed motor support using PWM (duty cycle) with separated direction signal, Brushed motor support with separate throttle and direction PWM (duty cyle)
-    // @Values: 0:Normal,1:OneShot,2:OneShot125,3:BrushedWithRelay,4:BrushedBiPolar,5:DShot150,6:DShot300,7:DShot600,8:DShot1200
-    // @User: Advanced
-    // @RebootRequired: True
-    AP_GROUPINFO("PWM_TYPE", 1, AE_Motors, _pwm_type, PWM_TYPE_NORMAL),
-
-    // @Param: PWM_FREQ
-    // @DisplayName: Motor Output PWM freq for brushed motors
-    // @Description: Motor Output PWM freq for brushed motors
-    // @Units: kHz
-    // @Range: 1 20
-    // @Increment: 1
-    // @User: Advanced
-    // @RebootRequired: True
-    AP_GROUPINFO("PWM_FREQ", 2, AE_Motors, _pwm_freq, 16),
 
     // @Param: SAFE_DISARM
     // @DisplayName: Motor PWM output disabled when disarmed
     // @Description: Disables motor PWM output when disarmed
     // @Values: 0:PWM enabled while disarmed, 1:PWM disabled while disarmed
     // @User: Advanced
-    AP_GROUPINFO("SAFE_DIS", 3, AE_Motors, _disarm_disable_pwm, 0),
+    AP_GROUPINFO("SAFE_DIS", 1, AE_Motors, _disarm_disable_pwm, 0),
 
     // @Param: THST_EXPO
     // @DisplayName: Thrust Curve Expo
     // @Description: Thrust curve exponent (-1 to +1 with 0 being linear)
     // @Range: -1.0 1.0
     // @User: Advanced
-    AP_GROUPINFO("THST_EXPO", 9, AE_Motors, _thrust_curve_expo, 0.0f),
+    AP_GROUPINFO("THST_EXPO", 2, AE_Motors, _thrust_curve_expo, 0.0f),
 
     // @Param: OUT_MIN
     // @DisplayName: Output minimum
@@ -65,30 +48,26 @@ const AP_Param::GroupInfo AE_Motors::var_info[] = {
     // @Range: 0 20
     // @Increment: 1
     // @User: Standard
-    AP_GROUPINFO("OUT_MIN", 10, AE_Motors, _output_min, 0),
+    AP_GROUPINFO("OUT_MIN", 3, AE_Motors, _output_min, 0),
 
 
     AP_GROUPEND
 };
 
 
-AE_Motors::AE_Motors(AP_ServoRelayEvents &relayEvents, AE_RobotArmInfo &rbt_arm_info) :
-    _relayEvents(relayEvents),
+AE_Motors::AE_Motors(AE_RobotArmInfo &rbt_arm_info) :
     _rbt_arm_info(rbt_arm_info)
 {
     AP_Param::setup_object_defaults(this, var_info);
     _singleton = this;
 }
 
-void AE_Motors::init(uint8_t frtype)
+void AE_Motors::init(uint8_t AE_type)
 {
-    _frame_type = AP_MotorsUGV::frame_type(frtype);
+    _con_type = (CON_TYPE)AE_type;
 
     // setup servo output
     setup_servo_output();
-
-    // setup pwm type
-    setup_pwm_type();
 
     // set safety output
     setup_safety_output();
@@ -98,29 +77,25 @@ void AE_Motors::init(uint8_t frtype)
 // setup output in case of main CPU failure
 void AE_Motors::setup_safety_output()
 {
-    if (_pwm_type == PWM_TYPE_BRUSHED_WITH_RELAY) {
-        SRV_Channels::set_trim_to_min_for(SRV_Channel::k_boom, true);
-        SRV_Channels::set_trim_to_min_for(SRV_Channel::k_forearm, true);
-        SRV_Channels::set_trim_to_min_for(SRV_Channel::k_bucket, true);
-        SRV_Channels::set_trim_to_min_for(SRV_Channel::k_rotation, true);
-    }
-
     // stop sending pwm if main CPU fails
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_boom, SRV_Channel::Limit::ZERO_PWM);
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_forearm, SRV_Channel::Limit::ZERO_PWM);
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_bucket, SRV_Channel::Limit::ZERO_PWM);
     SRV_Channels::set_failsafe_limit(SRV_Channel::k_rotation, SRV_Channel::Limit::ZERO_PWM);
+    SRV_Channels::set_failsafe_limit(SRV_Channel::k_cutting_header, SRV_Channel::Limit::ZERO_PWM);
+    SRV_Channels::set_failsafe_limit(SRV_Channel::k_support_leg, SRV_Channel::Limit::ZERO_PWM);
 }
 
 // setup servo output ranges
 void AE_Motors::setup_servo_output()
 {
-
-    //excavator boom/forearm/bucket as -1000 to 1000 values
+    //excavator boom/forearm/bucket as -100 to 100 values
     SRV_Channels::set_angle(SRV_Channel::k_boom,        100);
     SRV_Channels::set_angle(SRV_Channel::k_forearm,     100);
     SRV_Channels::set_angle(SRV_Channel::k_bucket,      100);
     SRV_Channels::set_angle(SRV_Channel::k_rotation,    100);
+    SRV_Channels::set_angle(SRV_Channel::k_cutting_header,    100);
+    SRV_Channels::set_angle(SRV_Channel::k_support_leg,    100);
 }
 
 // set boom as a value from -100 to 100
@@ -165,6 +140,28 @@ void AE_Motors::set_rotation(float rotation)
     _rotation = constrain_float(rotation, -100.0f, 100.0f);
 }
 
+// set cutting_header as a value from -100 to 100
+void AE_Motors::set_cutting_header(float cutting_header)
+{
+    // only allow setting cutting_header if armed
+    if (!hal.util->get_soft_armed()) {
+        return;
+    }
+
+    _cutting_header = constrain_float(cutting_header, -100.0f, 100.0f);
+}
+
+// set support_leg as a value from -100 to 100
+void AE_Motors::set_support_leg(float support_leg)
+{
+    // only allow setting support_leg if armed
+    if (!hal.util->get_soft_armed()) {
+        return;
+    }
+
+    _support_leg = constrain_float(support_leg, -100.0f, 100.0f);
+}
+
 // true if vehicle is capable of excavator
 bool AE_Motors::have_excavator() const
 {
@@ -181,7 +178,9 @@ bool AE_Motors::have_excavator() const
 bool AE_Motors::have_TBM() const
 {
     if (SRV_Channels::function_assigned(SRV_Channel::k_boom) &&
-        SRV_Channels::function_assigned(SRV_Channel::k_rotation)) {
+        SRV_Channels::function_assigned(SRV_Channel::k_rotation) &&
+        SRV_Channels::function_assigned(SRV_Channel::k_cutting_header) &&
+        SRV_Channels::function_assigned(SRV_Channel::k_support_leg)) {
         return true;
     }
     return false;
@@ -196,34 +195,33 @@ void AE_Motors::output(bool armed,  float dt)
         _forearm = 0.0f;
         _bucket = 0.0f;
         _rotation = 0.0f;
+        _cutting_header = 0.0f;
+        _support_leg = 0.0f;
     }
 
     // sanity check parameters
     sanity_check_parameters();
 
-    if(have_excavator()){
+    if(have_excavator() && (get_construction_type() == CON_TYPE::EXCAVATOR)){
         // output to excavator's boom , forearm , bucket and rotation channels
         output_excavator(armed, _boom, _forearm, _bucket, _rotation);
     }
-    else if(have_TBM()){
+    else if(have_TBM() && (get_construction_type() == CON_TYPE::TBM)){
         // output to excavator's boom , forearm , bucket and rotation channels
-        output_TBM(armed, _boom, _rotation);
+        output_TBM(armed, _boom, _rotation,_cutting_header,_support_leg);
     }
 }
 
 //  returns true if checks pass, false if they fail.  report should be true to send text messages to GCS
 bool AE_Motors::pre_arm_check(bool report) const
 {
-    if ((SRV_Channels::function_assigned(SRV_Channel::k_boom) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_forearm) ||
+    if ((
          SRV_Channels::function_assigned(SRV_Channel::k_bucket) ||
          SRV_Channels::function_assigned(SRV_Channel::k_rotation)) &&
-        (SRV_Channels::function_assigned(SRV_Channel::k_motor1) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_motor2) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_motor3) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_motor4))) {
+        (SRV_Channels::function_assigned(SRV_Channel::k_cutting_header) ||
+         SRV_Channels::function_assigned(SRV_Channel::k_support_leg))) {
         if (report) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: AE_Construction AND omni configured");
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: AE_Motors servo configured");
         }
         return false;
     }
@@ -234,46 +232,6 @@ bool AE_Motors::pre_arm_check(bool report) const
 void AE_Motors::sanity_check_parameters()
 {
     _output_min = constrain_int16(_output_min, 0, 20);
-}
-
-// setup pwm output type
-void AE_Motors::setup_pwm_type()
-{
-    _motor_mask = 0;
-
-    _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_boom);
-    _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_forearm);
-    _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_bucket);
-    _motor_mask |= SRV_Channels::get_output_channel_mask(SRV_Channel::k_rotation);
-
-    switch (_pwm_type) {
-    case PWM_TYPE_ONESHOT:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_ONESHOT);
-        break;
-    case PWM_TYPE_ONESHOT125:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_ONESHOT125);
-        break;
-    case PWM_TYPE_BRUSHED_WITH_RELAY:
-    case PWM_TYPE_BRUSHED_BIPOLAR:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_BRUSHED);
-        hal.rcout->set_freq(_motor_mask, uint16_t(_pwm_freq * 1000));
-        break;
-    case PWM_TYPE_DSHOT150:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_DSHOT150);
-        break;
-    case PWM_TYPE_DSHOT300:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_DSHOT300);
-        break;
-    case PWM_TYPE_DSHOT600:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_DSHOT600);
-        break;
-    case PWM_TYPE_DSHOT1200:
-        hal.rcout->set_output_mode(_motor_mask, AP_HAL::RCOutput::MODE_PWM_DSHOT1200);
-        break;
-    default:
-        // do nothing
-        break;
-    }
 }
 
 // output to excavator's boom , forearm and bucket channels
@@ -307,7 +265,7 @@ void AE_Motors::output_excavator(bool armed, float boom, float forearm, float bu
 }
 
 // output to excavator's boom , forearm and bucket channels
-void AE_Motors::output_TBM(bool armed, float boom, float rotation)
+void AE_Motors::output_TBM(bool armed, float boom, float rotation, float cutting_header, float support_leg)
 {
     if (!have_TBM()) {
         return;
@@ -318,15 +276,21 @@ void AE_Motors::output_TBM(bool armed, float boom, float rotation)
         if (_disarm_disable_pwm) {
             SRV_Channels::set_output_limit(SRV_Channel::k_boom, SRV_Channel::Limit::ZERO_PWM);
             SRV_Channels::set_output_limit(SRV_Channel::k_rotation, SRV_Channel::Limit::ZERO_PWM);
+            SRV_Channels::set_output_limit(SRV_Channel::k_cutting_header, SRV_Channel::Limit::ZERO_PWM);
+            SRV_Channels::set_output_limit(SRV_Channel::k_support_leg, SRV_Channel::Limit::ZERO_PWM);
         } else {
             SRV_Channels::set_output_limit(SRV_Channel::k_boom, SRV_Channel::Limit::TRIM);
             SRV_Channels::set_output_limit(SRV_Channel::k_rotation, SRV_Channel::Limit::TRIM);
+            SRV_Channels::set_output_limit(SRV_Channel::k_cutting_header, SRV_Channel::Limit::TRIM);
+            SRV_Channels::set_output_limit(SRV_Channel::k_support_leg, SRV_Channel::Limit::TRIM);
         }
         return;
     }
 
+    arm_output(SRV_Channel::k_cutting_header, cutting_header);
     arm_output(SRV_Channel::k_boom, boom);
     arm_output(SRV_Channel::k_rotation, rotation);
+    arm_output(SRV_Channel::k_support_leg, support_leg);
 
 }
 
@@ -334,7 +298,8 @@ void AE_Motors::output_TBM(bool armed, float boom, float rotation)
 void AE_Motors::arm_output(SRV_Channel::Aux_servo_function_t function, float arm_output, float dt)
 {
     // sanity check servo function
-    if (function != SRV_Channel::k_boom && function != SRV_Channel::k_forearm && function != SRV_Channel::k_bucket && function!= SRV_Channel::k_rotation) {
+    if (function != SRV_Channel::k_boom && function != SRV_Channel::k_forearm && function != SRV_Channel::k_bucket && function!= SRV_Channel::k_rotation && 
+        function != SRV_Channel::k_cutting_header && function != SRV_Channel::k_support_leg) {
         return;
     }
 
@@ -342,38 +307,7 @@ void AE_Motors::arm_output(SRV_Channel::Aux_servo_function_t function, float arm
     arm_output = get_scaled_arm_output(arm_output);
 
     // apply rate control
-    arm_output = get_rate_controlled_throttle(function, arm_output, dt);
-
-    // set relay if necessary
-    if (_pwm_type == PWM_TYPE_BRUSHED_WITH_RELAY) {
-        // find the output channel, if not found return
-        const SRV_Channel *out_chan = SRV_Channels::get_channel_for(function);
-        if (out_chan == nullptr) {
-            return;
-        }
-        const int8_t reverse_multiplier = out_chan->get_reversed() ? -1 : 1;
-        bool relay_high = is_negative(reverse_multiplier * arm_output);
-
-        switch (function) {
-        case SRV_Channel::k_boom:
-            _relayEvents.do_set_relay(2, relay_high);
-            break;
-        case SRV_Channel::k_forearm:
-            _relayEvents.do_set_relay(3, relay_high);
-            break;
-        case SRV_Channel::k_bucket:
-            _relayEvents.do_set_relay(4, relay_high);
-            break;
-        case SRV_Channel::k_rotation:
-            _relayEvents.do_set_relay(5, relay_high);
-            break;
-        default:
-            // do nothing
-            break;
-        }
-        // invert the output to always have positive value calculated by calc_pwm
-        arm_output = reverse_multiplier * fabsf(arm_output);
-    }
+    //arm_output = get_rate_controlled_throttle(function, arm_output, dt);
 
     arm_output = prevent_exceeding_position(function, arm_output);
 
@@ -493,7 +427,11 @@ bool AE_Motors::active() const
     }
 
     // check throttle is active
-    if (!is_zero(get_boom())||!is_zero(get_forearm())||!is_zero(get_bucket())||!is_zero(get_rotation())) {
+    if(have_excavator()){
+        if (!is_zero(get_boom())||!is_zero(get_forearm())||!is_zero(get_bucket())||!is_zero(get_rotation())) 
+        return true;
+    }else if(have_TBM()){
+        if (!is_zero(get_boom())||!is_zero(get_cutting_header())||!is_zero(get_support_leg())||!is_zero(get_rotation())) 
         return true;
     }
 

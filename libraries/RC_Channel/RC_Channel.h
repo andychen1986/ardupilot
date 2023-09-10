@@ -240,6 +240,8 @@ public:
         FOREARM =            213,
         BUCKET =             214,
         ROTATION =           215,
+        CUTTING_HEADER =     216,
+        SUPPORT_LEG =        217,
 
         // inputs for the use of onboard lua scripting
         SCRIPTING_1 =        300,

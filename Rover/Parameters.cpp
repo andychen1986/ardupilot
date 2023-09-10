@@ -694,7 +694,7 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @Values: 0:Undefined,1:excavator,2:TBM
     // @User: Standard
     // @RebootRequired: True
-    AP_GROUPINFO("CON_TYPE", 55, ParametersG2, AE_type, 0),
+    AP_GROUPINFO("AE_TYPE", 55, ParametersG2, AE_type, 0),
 
     // @Group: AWP_
     // @Path: ../libraries/AE_WPNav_Arm/AE_WPNav_Arm.cpp
@@ -748,7 +748,7 @@ ParametersG2::ParametersG2(void)
 #endif
     beacon(rover.serial_manager),
     motors(rover.ServoRelayEvents, wheel_rate_control),
-    arm_motors(rover.ServoRelayEvents, rbt_arm_info),
+    arm_motors(rbt_arm_info),
     wheel_rate_control(wheel_encoder),
     attitude_control(),
     smart_rtl(),

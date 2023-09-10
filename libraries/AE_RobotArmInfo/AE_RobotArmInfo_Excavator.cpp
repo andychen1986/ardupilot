@@ -230,6 +230,8 @@ int8_t AE_RobotArmInfo_Excavator::get_cylinder_length_state(int8_t cylinder_numb
         return AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG;
     }
 
+    if(cylinder_number > 2) return AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY;
+
     float distance_to_max_mm = ex_info.cylinder_status[cylinder_number].length_max_mm - ex_info.cylinder_status[cylinder_number].length_mm;
     float distance_to_min_mm = ex_info.cylinder_status[cylinder_number].length_mm - ex_info.cylinder_status[cylinder_number].length_min_mm;
 

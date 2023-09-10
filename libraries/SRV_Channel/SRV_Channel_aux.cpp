@@ -163,6 +163,8 @@ void SRV_Channel::aux_servo_function_setup(void)
     case k_forearm:
     case k_bucket:
     case k_rotation:
+    case k_cutting_header:
+    case k_support_leg:
         // fixed wing throttle
         set_range(100);
         break;
