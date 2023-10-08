@@ -109,6 +109,15 @@ ftype AE_RobotArmWP::get_distance(const RobotArmLocation &loc1, const RobotArmLo
     return norm(dx, dy);
 }
 
+Vector3f AE_RobotArmWP::get_diff_angle(const RobotArmJointAngle &angle1, const RobotArmJointAngle &angle2)
+{
+    Vector3f angle_diff;
+    angle_diff.x = (ftype)(angle1.theta_boom - angle2.theta_boom);
+    angle_diff.y = (ftype)(angle1.theta_forearm - angle2.theta_forearm);
+    angle_diff.z = (ftype)(angle1.theta_bucket - angle2.theta_bucket);
+    return angle_diff;
+}
+
 // see if location is past a line perpendicular to
 // the line between point1 and point2 and passing through point2.
 // If point1 is our previous waypoint and point2 is our target waypoint

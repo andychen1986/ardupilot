@@ -55,8 +55,15 @@ void ModeDig::update()
         break;
     }
     case Dig_Excavator: {
-        // nav to target loc (excavator)
-        // ...
+        // nav to target loc (Excavator)
+        if (!g2.wp_nav_arm.reached_destination()) {
+            // update navigation controller
+            navigate_to_arm_waypoint();
+        } else {
+            if(_is_last) {
+                stop_arm();      
+            }
+        }
         break;
     }
     default:

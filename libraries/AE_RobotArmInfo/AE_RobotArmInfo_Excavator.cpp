@@ -73,6 +73,44 @@ bool AE_RobotArmInfo_Excavator::check_if_info_valid(struct Excavator_Robot_Arm_S
     return true;
 }
 
+Vector3f AE_RobotArmInfo_Excavator::transferBucketAngle(Vector3f bucketAngle)
+{
+    //将倾角传感器的值转变为NM与x轴正向的夹角
+    float dangle_diff = 41; //倾角传感器安装位置与nm的偏差角
+    bucketAngle.x += dangle_diff;
+    if(bucketAngle.x >= 180){
+        bucketAngle.x -=360;
+    }
+    //转变为以N为原点旋转的角度
+    if(bucketAngle.x <= 0){
+        bucketAngle.x += 180;
+    }else{
+        bucketAngle.x = bucketAngle.x - 180;
+    }
+    // float a = 1.245, b = -175.487;
+
+    // // 使铲斗传感器值突变引起映射值在三角函数计算上连续
+    // if(bucketAngle.x < 0)
+    //     bucketAngle.x += 360;
+
+    // bucketAngle.x = a * bucketAngle.x + b;
+
+    return bucketAngle;
+}
+
+float AE_RobotArmInfo_Excavator::calc_BucketToBody(float origin_bucket)
+{
+    float angleQVP = 51, bucketToBody;
+    
+    if(origin_bucket > -angleQVP){
+        bucketToBody = -(180 - angleQVP - origin_bucket);
+    }else{
+        bucketToBody = angleQVP + origin_bucket - 180;
+    }
+
+    return bucketToBody;
+}
+
 // return false if the excavator information has not been calculated exactly.
 bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &ahrs, const Inclination *inclination, const AE_SlewingEncoder *slewingencoder)
 {
@@ -96,8 +134,10 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &ahrs, const I
     }
     _euler_boom_e2b_from_sensor = inclination->get_deg_location(Boom);
     _euler_forearm_e2b_from_sensor = inclination->get_deg_location(Forearm);
-    //bucket sensor installation is mounted in the opposite direction to the boom/forearm
-    _euler_bucket_e2b_from_sensor = -inclination->get_deg_location(Bucket);
+    _euler_bucket_e2b_from_sensor = inclination->get_deg_location(Bucket);
+
+    //铲斗传感器值映射
+    _euler_bucket_e2b_from_sensor = transferBucketAngle(_euler_bucket_e2b_from_sensor);
 
     boom_matrix.from_euler(radians(_euler_boom_e2b_from_sensor.x),radians(_euler_boom_e2b_from_sensor.y),ahrs.get_yaw());
     forearm_matrix.from_euler(radians(_euler_forearm_e2b_from_sensor.x),radians(_euler_forearm_e2b_from_sensor.y),ahrs.get_yaw());
@@ -115,10 +155,11 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &ahrs, const I
     float slewing_to_body = slewingencoder->get_angle_deg_diff_base2arm_loc(slewingencoder->INSTALL_SLEWING);
 
     adjust_to_body_origin(_euler_boom_e2b_from_sensor.x,_euler_forearm_e2b_from_sensor.x,_euler_bucket_e2b_from_sensor.x,boom_to_body,forearm_to_body,bucket_to_body);
+
     //Get the angle of boom, forearm, bucket relative to the previous joint
-    float boom_to_slewing = boom_to_body;
-    float forearm_to_boom = forearm_to_body - boom_to_slewing;
-    float bucket_to_forearm = bucket_to_body - forearm_to_boom - boom_to_slewing;
+    _exca_dh_anger.boom_to_slewing = boom_to_body;
+    _exca_dh_anger.forearm_to_boom = forearm_to_body - _exca_dh_anger.boom_to_slewing;
+    _exca_dh_anger.bucket_to_forearm = bucket_to_body - _exca_dh_anger.forearm_to_boom - _exca_dh_anger.boom_to_slewing;
 /*     
     //Used to test whether the coordinate system transformation is correct 
     AP::logger().Write("BP", "TimeUS,BoomR,BoomP,BoomY,ForeR,ForeP,ForeY,buckR,buckP,buckY",
@@ -137,7 +178,7 @@ bool AE_RobotArmInfo_Excavator::calc_excavator_info(const AP_AHRS &ahrs, const I
                 (float)degrees(_euler_bucket_e2b_from_sensor.z)); */
        
     calc_bucket_position(boom_to_body,forearm_to_body,bucket_to_body,slewing_to_body);
-    calc_oil_cylinder_length(boom_to_slewing,forearm_to_boom,bucket_to_forearm);
+    calc_oil_cylinder_length(_exca_dh_anger.boom_to_slewing, _exca_dh_anger.forearm_to_boom, _exca_dh_anger.bucket_to_forearm);
     return true;
 }
 
@@ -176,17 +217,18 @@ void AE_RobotArmInfo_Excavator::calc_bucket_position(float boom,float forearm,fl
 void AE_RobotArmInfo_Excavator::adjust_to_body_origin(float euler_boom, float euler_forearm, float euler_bucket,
                                                         float &boom_to_body,float &forearm_to_body,float &bucket_to_body)
 {
-    float angle_GNM;
     float angle_QNM;
     float distance_QM;
     float angle_MQN;
     float angle_MQK;
     float angle_DQV;
 
+    
+
     boom_to_body = euler_boom + radians(get_ex_param()._deg_BFC);
     forearm_to_body = euler_forearm;
-    angle_GNM = M_PI + forearm_to_body - radians(get_ex_param()._deg_GNF) - euler_bucket;
-    angle_QNM = M_2PI - radians(get_ex_param()._deg_FNQ) - radians(get_ex_param()._deg_GNF) - angle_GNM;
+    angle_QNM = M_PI - euler_forearm - radians(3) - radians(get_ex_param()._deg_FNQ) + euler_bucket;
+
     distance_QM = sqrt(get_ex_param()._mm_QN * get_ex_param()._mm_QN + get_ex_param()._mm_MN * get_ex_param()._mm_MN
                     - 2 * get_ex_param()._mm_QN * get_ex_param()._mm_MN * cosf(angle_QNM));
     angle_MQN = acosf((distance_QM * distance_QM + get_ex_param()._mm_QN * get_ex_param()._mm_QN - get_ex_param()._mm_MN * get_ex_param()._mm_MN)
@@ -209,17 +251,20 @@ void AE_RobotArmInfo_Excavator::adjust_to_body_origin(float euler_boom, float eu
 
 void AE_RobotArmInfo_Excavator::Write_Excavator_ArmInfo()
 {
-    AP::logger().Write("ARMP", "TimeUS,tip_x,tip_y,tip_z,boom_cyl,forearm_cyl,bucket_cyl",
-                "sm", // units: seconds, meters
-                "FB", // mult: 1e-6, 1e-2
-                "Qffffff", // format: uint64_t, float, float, float
+    AP::logger().Write("ARMP", "TimeUS,tip_x,tip_y,tip_z,bom_cl,for_cl,buk_cl,ag_bom,ag_for,ag_buk",
+                "smmmmmmmmm", // units: seconds, meters
+                "FBBBBBBBBB", // mult: 1e-6, 1e-2
+                "Qfffffffff", // format: uint64_t, float, float, float
                 AP_HAL::micros64(),
                 (float)ex_info.bucket_tip_pos_body.x,
                 (float)ex_info.bucket_tip_pos_body.y,
                 (float)ex_info.bucket_tip_pos_body.z,
                 (float)ex_info.cylinder_status[0].length_mm,
                 (float)ex_info.cylinder_status[1].length_mm,
-                (float)ex_info.cylinder_status[2].length_mm);
+                (float)ex_info.cylinder_status[2].length_mm,
+                (float)_exca_dh_anger.boom_to_slewing,
+                (float)_exca_dh_anger.forearm_to_boom,
+                (float)_exca_dh_anger.bucket_to_forearm);
 }
 
 
@@ -241,7 +286,7 @@ int8_t AE_RobotArmInfo_Excavator::get_cylinder_length_state(int8_t cylinder_numb
     else if(distance_to_max_mm <= 10.0f )
         return AE_RobotArmInfo::Robot_Arm_Safe_State::UP_ALERT;
 
-    else if(distance_to_min_mm <= 10.0f )
+    else if(distance_to_min_mm <= 10.0f)
         return AE_RobotArmInfo::Robot_Arm_Safe_State::DOWN_ALERT;
 
     return AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG;

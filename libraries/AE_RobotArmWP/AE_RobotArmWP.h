@@ -55,6 +55,38 @@ struct PACKED RobotArmLocation {
     }
 };
 
+struct PACKED RobotArmJointAngle {
+    float theta_boom;               //The parameter theta2 in the standard DH coordinate method:The angle between the coordinate axis x1 and the coordinate axis x2
+    float theta_forearm;            //The parameter theta3 in the standard DH coordinate method:The angle between the coordinate axis x2 and the coordinate axis x3
+    float theta_bucket;             //The parameter theta4 in the standard DH coordinate method:The angle between the coordinate axis x3 and the coordinate axis x4
+    float flags;                    //reserve
+
+    void zero() {
+        theta_boom = 0;
+        theta_forearm = 0;
+        theta_bucket = 0;
+        flags = 0;
+    }
+
+    Vector3f jointAngle() {
+        return Vector3f(theta_boom, theta_forearm, theta_bucket);
+    }
+
+    void set_jointAngle(Vector3f jointAngle) {
+        theta_boom = jointAngle.x;
+        theta_forearm = jointAngle.y;
+        theta_bucket = jointAngle.z;
+    }
+
+    RobotArmJointAngle& operator =(const VectorN<float, 4>& v) {
+        theta_boom = v[0];
+        theta_forearm = v[1];
+        theta_bucket = v[2];
+
+        return *this;
+    }
+};
+
 /// @class    AE_RobotArmWP
 /// @brief    Object managing robotic arm way points
 class AE_RobotArmWP
@@ -111,6 +143,9 @@ public:
     // return distance in meters between two locations
     static ftype get_distance(const RobotArmLocation &loc1, const RobotArmLocation &loc2);
 
+    // return difference between current and desired angles in radians
+    static Vector3f get_diff_angle(const RobotArmJointAngle &angle1, const RobotArmJointAngle &angle2);
+    
     // see if location is past a line perpendicular to
     // the line between point1 and point2 and passing through point2.
     // If point1 is our previous waypoint and point2 is our target waypoint

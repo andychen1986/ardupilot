@@ -33,7 +33,8 @@ public:
         SMART_RTL    = 12,
         GUIDED       = 15,
         INITIALISING = 16,
-        TBM          = 17
+        TBM          = 17,
+        EXCAVATOR    = 18
     };
 
     // Constructor
@@ -323,6 +324,41 @@ protected:
 private:
     void calc_boom(float target_speed);
     void calc_rotation(float turn_rate);
+
+    void convert_wp(RobotArmLocation& cmd);
+};
+
+class ModeExcavator : public ModeDig
+{
+public:
+    uint32_t mode_number() const override { return EXCAVATOR; }
+    const char *name4() const override { return "Excavator"; }
+
+    void stop_arm() override;
+
+protected:
+    bool __enter() override;
+    void __exit() override;
+
+    bool start_command(const RobotArmLocation& cmd) override;
+    void exit_mission() override;
+    bool verify_command_callback(const RobotArmLocation& cmd) override;
+
+    void set_submode() override;
+    bool do_nav_wp(const RobotArmLocation& cmd) override;
+
+    // high level call to navigate to waypoint
+    void navigate_to_arm_waypoint() override;
+
+private:
+    float l_boom;
+    float l_forearm;
+    float l_bucket;
+
+    void calc_boom(float target_speed);
+    void calc_rotation(float turn_rate);
+
+    bool get_ExcavatorParam();
 
     void convert_wp(RobotArmLocation& cmd);
 };

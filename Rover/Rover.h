@@ -270,6 +270,7 @@ private:
     ModeFollow mode_follow;
     ModeSimple mode_simple;
     ModeTBM mode_tbm;
+    ModeExcavator mode_excavator;
 
     // cruise throttle and speed learning
     typedef struct {

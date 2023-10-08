@@ -97,6 +97,7 @@ public:
     uint16_t get_single_turn_count_loc(enum Install_Location location) const;
     uint16_t get_total_turns_count_loc(enum Install_Location location) const;
     uint32_t get_full_turns_counts_loc(enum Install_Location location) const;
+    uint16_t get_ammeter_amperes(enum Install_Location location) const; 
     
     // get the system time (in milliseconds) of the last update
     uint32_t get_last_reading_ms(uint8_t instance) const;

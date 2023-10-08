@@ -760,7 +760,8 @@ ParametersG2::ParametersG2(void)
     windvane(),
     wp_nav(attitude_control, rover.L1_controller),
     arm_pos_controller(rover.G_Dt),
-    wp_nav_arm(arm_pos_controller, arm_nav),
+    angleController(rover.G_Dt),
+    wp_nav_arm(arm_pos_controller, arm_nav, angleController),
     sailboat()
 {
     AP_Param::setup_object_defaults(this, var_info);

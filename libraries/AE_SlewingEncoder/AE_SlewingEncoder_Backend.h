@@ -32,7 +32,9 @@ public:
     
     uint16_t total_turns_count() const { return state.total_turns_count; }
 
-    uint32_t full_turns_counts() const { return state.full_turn_count; }           
+    uint32_t full_turns_counts() const { return state.full_turn_count; }  
+
+    uint16_t get_ammeter_amperes() const { return state.ammeter_amperes;}
 
     AE_SlewingEncoder::SlewingEncoder_Status status() const;
 

@@ -226,6 +226,15 @@ uint32_t AE_SlewingEncoder::get_full_turns_counts_loc(enum Install_Location loca
     return backend->full_turns_counts();
 }
 
+uint16_t AE_SlewingEncoder::get_ammeter_amperes(enum Install_Location location) const
+{
+    AE_SlewingEncoder_Backend *backend = find_instance(location);
+    if (backend == nullptr) {
+        return 0;
+    }
+    return backend->get_ammeter_amperes();
+}
+
 // check if an instance is activated
 bool AE_SlewingEncoder::enabled(uint8_t instance) const
 {
@@ -258,11 +267,12 @@ void AE_SlewingEncoder::Log_SLEN() const
         LOG_PACKET_HEADER_INIT(LOG_SLEN_MSG),
         time_us                 : AP_HAL::micros64(),
         angle_diff_base2arm     : degrees(get_angle_deg_diff_base2arm_loc(Install_Location::INSTALL_SLEWING)),
-        single_turn_count       : get_single_turn_count_loc(Install_Location::INSTALL_SLEWING),
-        total_turns_count       : get_total_turns_count_loc(Install_Location::INSTALL_SLEWING),        
-        amp_yaw                 : (uint16_t)ahrs.yaw_sensor,
-        full_turns_counts       : get_full_turns_counts_loc(Install_Location::INSTALL_SLEWING),
-        inclination_yaw         : inclination->yaw_deg_location(Boom)
+        single_count            : get_single_turn_count_loc(Install_Location::INSTALL_SLEWING),
+        total_count             : get_total_turns_count_loc(Install_Location::INSTALL_SLEWING),        
+        apm_yaw                 : (uint16_t)ahrs.yaw_sensor,
+        full_counts             : get_full_turns_counts_loc(Install_Location::INSTALL_SLEWING),
+        incl_yaw                : inclination->yaw_deg_location(Boom),
+        ammeter_amp             : get_ammeter_amperes(Install_Location::INSTALL_SLEWING)
     };
     AP::logger().WriteBlock(&pkt, sizeof(pkt));
 }

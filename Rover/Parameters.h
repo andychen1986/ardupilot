@@ -12,6 +12,7 @@
 #include <AE_WPNav_Arm/AE_WPNav_Arm.h>
 #include <AE_Control_Arm/AE_PosControl_Arm.h>
 #include <AE_Navigation_Arm/AE_Linear_Nav_Arm.h>
+#include "AE_Control_Arm/AE_AngleControl.h"
 
 // Global parameter class.
 //
@@ -416,6 +417,8 @@ public:
 
     AE_PosControl_Arm arm_pos_controller;
     AE_Linear_Nav_Arm arm_nav;
+
+    AE_AngleControl angleController;
 
     // Sailboat functions
     Sailboat sailboat;

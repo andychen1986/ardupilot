@@ -21,6 +21,17 @@ public:
     // retrieve updates excavator robot arm info
     void update() override;
 
+    //获取标准DH参数法中的三个关节角度θ1，θ2，θ3
+    struct Excavator_DH_Anger
+    {
+        float boom_to_slewing;
+        float forearm_to_boom;
+        float bucket_to_forearm;
+    };
+
+    //获取标准DH参数中的θ角结构体 
+    Excavator_DH_Anger get_DH_Angles() const        {return _exca_dh_anger;}
+
     //get the cutting header state at base's body frame
     // AP_TBM_Info::TBM_Cutting_Header_State get_TBM_cutting_header_state() const { return _cutting_header_state; }
 
@@ -31,6 +42,8 @@ public:
     int8_t get_cylinder_length_state(int8_t cylinder_number) override;
 
 private:
+    // 挖掘机标准DH参数中的θ角结构体
+    struct Excavator_DH_Anger _exca_dh_anger;
 
     // backend state
     struct Excavator_Robot_Arm_State {
@@ -41,6 +54,10 @@ private:
         Vector3f bucket_tip_pos_body;
         struct AE_RobotArmInfo::Ex_Cylinder_State cylinder_status[OIL_CYLINDER_NUM_MAX];
     } ex_info;
+
+    Vector3f transferBucketAngle(Vector3f bucketAngle);     //根据安装位置对铲斗角度做一个线性映射
+
+    float calc_BucketToBody(float origin_bucket);                              //计算铲斗相对机体的角度
 
     void Write_Excavator_ArmInfo();
 

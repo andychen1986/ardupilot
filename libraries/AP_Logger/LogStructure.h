@@ -391,11 +391,12 @@ struct PACKED log_SlewingEncoder {
     LOG_PACKET_HEADER;
     uint64_t time_us;
     float angle_diff_base2arm;
-    uint16_t single_turn_count;
-    uint16_t total_turns_count;
-    uint16_t amp_yaw;
-    uint32_t full_turns_counts;
-    float inclination_yaw;
+    uint16_t single_count;
+    uint16_t total_count;
+    uint16_t apm_yaw;
+    uint32_t full_counts;
+    float incl_yaw;
+    uint16_t ammeter_amp;
 };
 
 struct PACKED log_ADSB {
@@ -1459,7 +1460,7 @@ LOG_STRUCTURE_FROM_AIS, \
     { LOG_RAWP_MSG, sizeof(log_Robot_Arm_WP), \
       "RAWP", "QBBfff", "TimeUS,Tot,Seq,x,y,Alt", "s--mmm", "F-----" }, \
     { LOG_SLEN_MSG, sizeof(log_SlewingEncoder), \
-      "SLEN", "QfHHHIf", "TimeUS,diffBArm,singleCount,totalCounts,ApmYaw,fullCount,inclYaw", "sd--h-d", "F---B--" }
+      "SLEN", "QfHHHIfH", "TimeUS,diffBArm,singleCnt,totalCnts,AYaw,fullCnt,IYaw,amperes", "sd--h-da", "F---B---" }
 
 
 // message types 0 to 63 reserved for vehicle specific use
