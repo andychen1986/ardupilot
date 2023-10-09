@@ -1,161 +1,45 @@
-# ArduPilot Project
+# ArduPilot_Develop Project
 
-<a href="https://ardupilot.org/discord"><img src="https://img.shields.io/discord/674039678562861068.svg" alt="Discord">
+[Rover4.2源代码](https://gitee.com/lisq58/ardupilot_develop/tree/Rover-4.2.0/)
 
-[![Test Copter](https://github.com/ArduPilot/ardupilot/workflows/test%20copter/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_copter.yml) [![Test Plane](https://github.com/ArduPilot/ardupilot/workflows/test%20plane/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_plane.yml) [![Test Rover](https://github.com/ArduPilot/ardupilot/workflows/test%20rover/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_rover.yml) [![Test Sub](https://github.com/ArduPilot/ardupilot/workflows/test%20sub/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_sub.yml) [![Test Tracker](https://github.com/ArduPilot/ardupilot/workflows/test%20tracker/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_tracker.yml)
+本文档为底层代码开发的说明与帮助
 
-[![Test AP_Periph](https://github.com/ArduPilot/ardupilot/workflows/test%20ap_periph/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_sitl_periph.yml) [![Test Chibios](https://github.com/ArduPilot/ardupilot/workflows/test%20chibios/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_chibios.yml) [![Test Linux SBC](https://github.com/ArduPilot/ardupilot/workflows/test%20Linux%20SBC/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_linux_sbc.yml) [![Test Replay](https://github.com/ArduPilot/ardupilot/workflows/test%20replay/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_replay.yml)
+## Git使用指南 ##
+[git下载地址](https://git-scm.com/downloads)  
+***克隆仓库***：git clone -b "分支名称" "远程仓库地址"  
+***设置当前git的使用者名称***：git config --global user.name "你的名字"  
+***设置当前git的使用者邮箱***：git config --global user.email "你的邮箱"   
+***查看git日志***:git log  
+***查看当前分支状态***：git status   
+***提交本次修改至暂存区***：git add 文件名称   
+***提交本次修改至仓库***：git commit -m “本次修改的备注"   
+***将当前修改合并到上一次提交并修改上次提交的备注***：git commit --amend   
+***将当前修改存入临时区域以方便切换分支或其他操作***：git stash   
+***将存入临时区域中的最近一次修改恢复***：git stash pop   
+***查看当前所有创建的分知名***:git branch   
+***切换分支***：git checkout 分支名称   
+***新建当前分支副本并切换至新分支***：git checkout -b 分支名称   
+***显示所有已创建远端仓库的名称及其网址***：git remote -v   
+***新建远端仓库***：git remote add 远端仓库名称 远端仓库https(仅限gitee，若需要拉取git代码应使用ssh[参考](https://blog.csdn.net/ljk126wy/article/details/87881923))   
+***拉取远端仓库指定分支同时为该分支创建本地分支***：git fetch 远端仓库名称 远端仓库指定分支:新建本地分支名   
+***添加指定提交的代码***：git cherry-pick 该提交的hash值   
+***将分支回溯到指定提交版本并舍弃所有该提交之后的更改***：git reset --hard 指定提交的hash值   
+***将分支回溯到指定提交版本保留所有该提交之后的更改***：git reset --soft 指定提交的hash值   
 
-[![Test Unit Tests](https://github.com/ArduPilot/ardupilot/workflows/test%20unit%20tests/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/ardupilot/actions/workflows/test_unit_tests.yml) [![test size](https://github.com/ArduPilot/ardupilot/actions/workflows/test_size.yml/badge.svg)](https://github.com/ArduPilot/ardupilot/actions/workflows/test_size.yml)
+## 仓库使用说明 ##
+通过missionplanner_param文件中的参数表使用各个版本的代码    
+[添加新的项目或任务](https://cvwz2djf69d.feishu.cn/share/base/form/shrcnOKT2Q66Vw8STW1jTLXB29e)   
+[项目进度更新](https://cvwz2djf69d.feishu.cn/base/B5cpbx0nKakEaRs8d4pc0EIenAd?table=tblhPtvXAZk9vOFC&view=vewXxBNTOK)   
+## 更新者代码网址 ##
 
-[![Test Environment Setup](https://github.com/ArduPilot/ardupilot/actions/workflows/test_environment.yml/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/actions/workflows/test_environment.yml)
+- [陈导](https://github.com/andychen1986/ardupilot):
+  - ***主要开发模块***: AE_RobotArmWP,AE_RobotArmInfo,AE_RobotArmWP,AE_SlewingEncoder
 
-[![Cygwin Build](https://github.com/ArduPilot/ardupilot/actions/workflows/cygwin_build.yml/badge.svg)](https://github.com/ArduPilot/ardupilot/actions/workflows/cygwin_build.yml) [![Macos Build](https://github.com/ArduPilot/ardupilot/actions/workflows/macos_build.yml/badge.svg)](https://github.com/ArduPilot/ardupilot/actions/workflows/macos_build.yml)
-
-[![Coverity Scan Build Status](https://scan.coverity.com/projects/5331/badge.svg)](https://scan.coverity.com/projects/ardupilot-ardupilot)
-
-[![Test Coverage](https://github.com/ArduPilot/ardupilot/actions/workflows/test_coverage.yml/badge.svg?branch=master)](https://github.com/ArduPilot/ardupilot/actions/workflows/test_coverage.yml)
-
-[![Autotest Status](https://autotest.ardupilot.org/autotest-badge.svg)](https://autotest.ardupilot.org/)
-
-ArduPilot is the most advanced, full-featured, and reliable open source autopilot software available.
-It has been under development since 2010 by a diverse team of professional engineers, computer scientists, and community contributors.
-Our autopilot software is capable of controlling almost any vehicle system imaginable, from conventional airplanes, quad planes, multi-rotors, and helicopters to rovers, boats, balance bots, and even submarines.
-It is continually being expanded to provide support for new emerging vehicle types.
-
-## The ArduPilot project is made up of: ##
-
-- ArduCopter: [code](https://github.com/ArduPilot/ardupilot/tree/master/ArduCopter), [wiki](https://ardupilot.org/copter/index.html)
-
-- ArduPlane: [code](https://github.com/ArduPilot/ardupilot/tree/master/ArduPlane), [wiki](https://ardupilot.org/plane/index.html)
-
-- Rover: [code](https://github.com/ArduPilot/ardupilot/tree/master/Rover), [wiki](https://ardupilot.org/rover/index.html)
-
-- ArduSub : [code](https://github.com/ArduPilot/ardupilot/tree/master/ArduSub), [wiki](http://ardusub.com/)
-
-- Antenna Tracker : [code](https://github.com/ArduPilot/ardupilot/tree/master/AntennaTracker), [wiki](https://ardupilot.org/antennatracker/index.html)
-
-## User Support & Discussion Forums ##
-
-- Support Forum: <https://discuss.ardupilot.org/>
-
-- Community Site: <https://ardupilot.org>
-
-## Developer Information ##
-
-- Github repository: <https://github.com/ArduPilot/ardupilot>
-
-- Main developer wiki: <https://ardupilot.org/dev/>
-
-- Developer discussion: <https://discuss.ardupilot.org>
-
-- Developer chat: <https://discord.com/channels/ardupilot>
-
-## Top Contributors ##
-
-- [Flight code contributors](https://github.com/ArduPilot/ardupilot/graphs/contributors)
-- [Wiki contributors](https://github.com/ArduPilot/ardupilot_wiki/graphs/contributors)
-- [Most active support forum users](https://discuss.ardupilot.org/u?order=post_count&period=quarterly)
-- [Partners who contribute financially](https://ardupilot.org/about/Partners)
-
-## How To Get Involved ##
-
-- The ArduPilot project is open source and we encourage participation and code contributions: [guidelines for contributors to the ardupilot codebase](https://ardupilot.org/dev/docs/contributing.html)
-
-- We have an active group of Beta Testers to help us improve our code: [release procedures](https://ardupilot.org/dev/docs/release-procedures.html)
-
-- Desired Enhancements and Bugs can be posted to the [issues list](https://github.com/ArduPilot/ardupilot/issues).
-
-- Help other users with log analysis in the [support forums](https://discuss.ardupilot.org/)
-
-- Improve the wiki and chat with other [wiki editors on Discord #documentation](https://discord.com/channels/ardupilot)
-
-- Contact the developers on one of the [communication channels](https://ardupilot.org/copter/docs/common-contact-us.html)
-
-## License ##
-
-The ArduPilot project is licensed under the GNU General Public
-License, version 3.
-
-- [Overview of license](https://dev.ardupilot.com/wiki/license-gplv3)
-
-- [Full Text](https://github.com/ArduPilot/ardupilot/blob/master/COPYING.txt)
-
-## Maintainers ##
-
-ArduPilot is comprised of several parts, vehicles and boards. The list below
-contains the people that regularly contribute to the project and are responsible
-for reviewing patches on their specific area.
-
-- [Andrew Tridgell](https://github.com/tridge):
-  - ***Vehicle***: Plane, AntennaTracker
-  - ***Board***: Pixhawk, Pixhawk2, PixRacer
-- [Francisco Ferreira](https://github.com/oxinarf):
-  - ***Bug Master***
-- [Grant Morphett](https://github.com/gmorph):
-  - ***Vehicle***: Rover
-- [Jacob Walser](https://github.com/jaxxzer):
-  - ***Vehicle***: Sub
-- [Lucas De Marchi](https://github.com/lucasdemarchi):
-  - ***Subsystem***: Linux
-- [Michael du Breuil](https://github.com/WickedShell):
-  - ***Subsystem***: Batteries
-  - ***Subsystem***: GPS
-  - ***Subsystem***: Scripting
-- [Peter Barker](https://github.com/peterbarker):
-  - ***Subsystem***: DataFlash, Tools
-- [Randy Mackay](https://github.com/rmackay9):
-  - ***Vehicle***: Copter, Rover, AntennaTracker
-- [Siddharth Purohit](https://github.com/bugobliterator):
-  - ***Subsystem***: CAN, Compass
-  - ***Board***: Cube*
-- [Tom Pittenger](https://github.com/magicrub):
-  - ***Vehicle***: Plane
-- [Bill Geyer](https://github.com/bnsgeyer):
-  - ***Vehicle***: TradHeli
-- [Emile Castelnuovo](https://github.com/emilecastelnuovo):
-  - ***Board***: VRBrain
-- [Georgii Staroselskii](https://github.com/staroselskii):
-  - ***Board***: NavIO
-- [Gustavo José de Sousa](https://github.com/guludo):
-  - ***Subsystem***: Build system
-- [Julien Beraud](https://github.com/jberaud):
-  - ***Board***: Bebop & Bebop 2
-- [Leonard Hall](https://github.com/lthall):
-  - ***Subsystem***: Copter attitude control and navigation
-- [Matt Lawrence](https://github.com/Pedals2Paddles):
-  - ***Vehicle***: 3DR Solo & Solo based vehicles
-- [Matthias Badaire](https://github.com/badzz):
-  - ***Subsystem***: FRSky
-- [Mirko Denecke](https://github.com/mirkix):
-  - ***Board***: BBBmini, BeagleBone Blue, PocketPilot
-- [Paul Riseborough](https://github.com/priseborough):
-  - ***Subsystem***: AP_NavEKF2
-  - ***Subsystem***: AP_NavEKF3
-- [Víctor Mayoral Vilches](https://github.com/vmayoral):
-  - ***Board***: PXF, Erle-Brain 2, PXFmini
-- [Amilcar Lucas](https://github.com/amilcarlucas):
-  - ***Subsystem***: Marvelmind
-- [Samuel Tabor](https://github.com/samuelctabor):
-  - ***Subsystem***: Soaring/Gliding
-- [Henry Wurzburg](https://github.com/Hwurzburg):
-  - ***Subsystem***: OSD
-  - ***Site***: Wiki
-- [Peter Hall](https://github.com/IamPete1):
-  - ***Vehicle***: Tailsitters
-  - ***Vehicle***: Sailboat
-  - ***Subsystem***: Scripting
-- [Andy Piper](https://github.com/andyp1per):
-  - ***Subsystem***: Crossfire
-  - ***Subsystem***: ESC
-  - ***Subsystem***: OSD
-  - ***Subsystem***: SmartAudio
-- [Alessandro Apostoli ](https://github.com/yaapu):
-  - ***Subsystem***: Telemetry
-  - ***Subsystem***: OSD
-- [Rishabh Singh ](https://github.com/rishabsingh3003):
-  - ***Subsystem***: Avoidance/Proximity
-- [David Bussenschutt ](https://github.com/davidbuzz):
-  - ***Subsystem***: ESP32,AP_HAL_ESP32
-- [Charles Villard ](https://github.com/Silvanosky):
-  - ***Subsystem***: ESP32,AP_HAL_ESP32
+- [李绍谦](https://gitee.com/lisq58/my_ardupilot):
+  - ***主要开发模块***: AE_Motors
+- [周湛豪](https://gitee.com/chengweidaniu/ardupilot):
+  - ***主要开发模块***：Excavation_mode
+- [骆仁贤](https://gitee.com/Cyanluorx/Excavator.git):
+  - ***主要开发模块***: AE_Control_Arm,AE_Mission_Arm,AE_Navigation_Arm,AE_RobotArmWP,AE_WPNav_Arm
+- [林翔宇](https://github.com/LinXiangY/ardupilot/tree/TBM_cuttinghead):
+  - ***主要开发模块***：AE_RobotArmInfo
