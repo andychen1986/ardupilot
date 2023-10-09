@@ -399,14 +399,22 @@ float AE_Motors::prevent_exceeding_position(SRV_Channel::Aux_servo_function_t fu
         
         case AE_RobotArmInfo::Robot_Arm_Safe_State::DOWN_ALERT:
             arm_output = constrain_float(arm_output, -100.0f, 0.0f);
+            if(now - emerg_warm_time > 2000U){
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "Output controller stopped due to reached DOWN_ALERT!");
+                emerg_warm_time = now;
+            }
             break;
         
         case AE_RobotArmInfo::Robot_Arm_Safe_State::UP_ALERT:
             arm_output = constrain_float(arm_output, 0.0f, 100.0f);
+            if(now - emerg_warm_time > 2000U){
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "Output controller stopped due to reached UP_ALERT!");
+                emerg_warm_time = now;
+            }
             break;
 
         case AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG:
-            if(emerg_warm_time = AP_HAL::millis() > 5000U){
+            if(now - emerg_warm_time > 2000U){
                 gcs().send_text(MAV_SEVERITY_CRITICAL, "Output controller stopped due to unhealthy sensor data!");
                 emerg_warm_time = now;
             }
