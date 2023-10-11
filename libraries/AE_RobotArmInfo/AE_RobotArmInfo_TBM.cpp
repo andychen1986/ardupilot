@@ -10,7 +10,7 @@
 void AE_RobotArmInfo_TBM::init()
 {
     // update health
-    _state.flags.healthy = true;
+    _state.flags.healthy = false;
 
     // assign the initial value of Robot_Arm_State::_backend_state at the front end
     _state.type = (int8_t)AE_RobotArmInfo::Type::TBM;
@@ -109,7 +109,17 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
     Matrix3f transformation;
     Matrix3f boom_matrix;
 
-    transformation.from_euler(_ahrs.get_roll(),_ahrs.get_pitch(),radians(_inclination->yaw_deg_location(Boom) - 90));
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+    transformation.from_euler(_ahrs.get_roll(), _ahrs.get_pitch(), radians(_ahrs.get_yaw()));
+#else
+    transformation.from_euler(_ahrs.get_roll(), _ahrs.get_pitch(), radians(_inclination->yaw_deg_location(Boom)));
+#endif
+    Matrix3f dboomrdbody;
+    // dboomrdbody
+    dboomrdbody.from_euler(0, 0, radians(-90));
+    // dboomrbody = dboomrdbody*dbodyrbody
+    transformation = dboomrdbody*transformation;
+    
     if(!transformation.invert())
     {
         return false;
@@ -126,8 +136,12 @@ bool AE_RobotArmInfo_TBM::update_TBM_cutting_header_state(const AP_AHRS &_ahrs, 
     boom_to_body = _euler_boom_e2b_from_sensor.x + radians(get_tbm_param()._deg_BFC);
 
     // slewing deg while cutting head is in mid deg=0,should use information from encoder but now use inclination
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+    slewing_to_body = _euler_boom_e2b_from_sensor.z;
+#else
     slewing_to_body = slewingencoder->get_angle_deg_diff_base2arm_loc(slewingencoder->INSTALL_SLEWING);
-    // slewing_to_body = radians(_inclination->yaw_deg_location(Boom));
+#endif
+
     _cuthead_state.cutheader_height =  get_tbm_param()._mm_CF*sinf(boom_to_body) + get_tbm_param()._mm_JL;
     _cuthead_state.cutheader_horizon_pos = sinf(slewing_to_body)*(get_tbm_param()._mm_CF*cosf(boom_to_body) + get_tbm_param()._mm_JC);
 

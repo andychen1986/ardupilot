@@ -143,6 +143,10 @@ bool AE_WPNav_Arm::get_position_xy_mm(RobotArmLocation& loc)
 
     AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)_armInfo_backend;
 
+    if(!arminfo_backend->get_healthy()) {
+        return false;
+    }
+
     AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
 
     loc.xhorizontal = state_tbm.cutheader_horizon_pos;

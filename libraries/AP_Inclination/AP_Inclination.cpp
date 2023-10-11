@@ -1,6 +1,7 @@
 #include "AP_Inclination.h"
 #include "AP_Inclination_HDA436T_Serial.h"
 #include "AP_Inclination_3HDA436Ts_Serial.h"
+#include "AP_Inclination_SITL.h"
 #include <AP_BoardConfig/AP_BoardConfig.h>
 #include <AP_Logger/AP_Logger.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
@@ -105,7 +106,7 @@ void Inclination::update(void)
     }
 
     //if AP_Inclination_3HDA436Ts_Serial is used, then update the other 2 drivers state by hand.
-    if ((Type)params[0].type.get() == Type::three_HDA436Ts_Serial) {
+    if ((Type)params[0].type.get() == Type::three_HDA436Ts_Serial || (Type)params[0].type.get() == Type::SIM) {
         for(uint8_t i=1; i<INCLINATION_MAX_INSTANCES; i++)
         {
             state[i] = state[0];
@@ -129,7 +130,9 @@ bool Inclination::_add_backend(AP_Inclination_Backend *backend, uint8_t instance
         // we've allocated the same instance twice
         INTERNAL_ERROR(AP_InternalError::error_t::flow_of_control);
     }
+#if CONFIG_HAL_BOARD != HAL_BOARD_SITL
     backend->init_serial(serial_instance);
+#endif
     drivers[instance] = backend;
     num_instances = MAX(num_instances, instance+1);
     return true;
@@ -158,11 +161,11 @@ void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
         }
         break;
 
-    //     case Type::SIM:
-    // #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-    //         _add_backend(new AP_Inclination_SITL(state[instance], params[instance], instance), instance);
-    // #endif
-    //         break;
+    case Type::SIM:
+    #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+        _add_backend(new AP_Inclination_SITL(state[instance], params[instance]), instance, serial_instance);
+    #endif
+        break;
 
     case Type::NONE:
     default:

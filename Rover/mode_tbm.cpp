@@ -18,7 +18,6 @@ bool ModeTBM::start_command(const RobotArmLocation& cmd)
 
 bool ModeTBM::verify_command_callback(const RobotArmLocation& cmd)
 {
-    // for test
     RobotArmLocation real_cmd(cmd);
     convert_wp(real_cmd);
 
@@ -42,7 +41,6 @@ void ModeTBM::set_submode()
 
 bool ModeTBM::do_nav_wp(const RobotArmLocation& cmd)
 {
-    // for test
     RobotArmLocation real_cmd(cmd);
     convert_wp(real_cmd);
 

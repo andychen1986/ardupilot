@@ -39,7 +39,7 @@
   - ***主要开发模块***: AE_Motors
 - [周湛豪](https://gitee.com/chengweidaniu/ardupilot):
   - ***主要开发模块***：Excavation_mode
-- [骆仁贤](https://gitee.com/Cyanluorx/Excavator.git):
-  - ***主要开发模块***: AE_Control_Arm,AE_Mission_Arm,AE_Navigation_Arm,AE_RobotArmWP,AE_WPNav_Arm
+- [骆任贤](https://gitee.com/Cyanluorx/Excavator.git):
+  - ***主要开发模块***: AE_Control_Arm,AE_Mission_Arm,AE_Navigation_Arm,AE_RobotArmWP,AE_WPNav_Arm,SIM_TBM
 - [林翔宇](https://github.com/LinXiangY/ardupilot/tree/TBM_cuttinghead):
   - ***主要开发模块***：AE_RobotArmInfo

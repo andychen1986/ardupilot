@@ -86,6 +86,12 @@ struct sitl_fdm {
     } wind_vane_apparent;
 
     bool is_lock_step_scheduled;
+
+    struct {
+        Vector3f roll_deg;                 // roll_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+        Vector3f pitch_deg;                // pitch_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+        Vector3f yaw_deg;                  // yaw_deg.x/.y/.z denote boom/forearm/bucket angle in degree
+    } inclination_state;
 };
 
 // number of rc output channels

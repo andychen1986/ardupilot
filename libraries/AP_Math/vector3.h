@@ -132,6 +132,13 @@ public:
         return *this;
     }
 
+    Vector3<T> &limit_xyz(const T lnum, const T hnum) {
+        x = (x < lnum) ? lnum : (x > hnum ? hnum : x);
+        y = (y < lnum) ? lnum : (y > hnum ? hnum : y);
+        z = (z < lnum) ? lnum : (z > hnum ? hnum : z);
+        return *this;
+    }
+
     // allow a vector3 to be used as an array, 0 indexed
     T & operator[](uint8_t i) {
         T *_v = &x;

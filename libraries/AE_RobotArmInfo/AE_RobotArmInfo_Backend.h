@@ -46,7 +46,7 @@ public:
     }
 
     // get cylinder length state
-    virtual int8_t get_cylinder_length_state(int8_t cylinder_number);
+    virtual int8_t get_cylinder_length_state(int8_t cylinder_number) = 0;
 
 protected:
     const AE_RobotArmInfo&  _frontend;          // reference to robot arm info front end

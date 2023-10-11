@@ -1459,7 +1459,7 @@ LOG_STRUCTURE_FROM_AIS, \
     { LOG_RAWP_MSG, sizeof(log_Robot_Arm_WP), \
       "RAWP", "QBBfff", "TimeUS,Tot,Seq,x,y,Alt", "s--mmm", "F-----" }, \
     { LOG_SLEN_MSG, sizeof(log_SlewingEncoder), \
-      "SLEN", "QfHHHIf", "TimeUS,diffBaseArm,singleCount,totalCounts,ApmYaw,fullCount,incliYaw", "sd--h-d", "F---B--" }
+      "SLEN", "QfHHHIf", "TimeUS,diffBArm,singleCount,totalCounts,ApmYaw,fullCount,inclYaw", "sd--h-d", "F---B--" }
 
 
 // message types 0 to 63 reserved for vehicle specific use

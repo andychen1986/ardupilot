@@ -150,7 +150,7 @@ void AE_SlewingEncoder::detect_instance(uint8_t instance, uint8_t& serial_instan
 
     case SlewingEncoder_TYPE_SITL:
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        _add_backend(new AE_SlewingEncoder_SITL(_state[instance], instance), instance);
+        // _add_backend(new AE_SlewingEncoder_SITL(_state[instance], instance), instance);
 #endif
         break;
         

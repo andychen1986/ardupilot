@@ -16,6 +16,7 @@ public:
     // retrieve updates from sensor
     void update() override;
 
+    int8_t get_cylinder_length_state(int8_t cylinder_number) override {return 0;};
 
     //get the cutting header state at base's body frame
     // AP_TBM_Info::TBM_Cutting_Header_State get_TBM_cutting_header_state() const { return _cutting_header_state; }

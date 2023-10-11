@@ -126,7 +126,7 @@ void AE_PosControl_Arm::update_xy_controller(Vector2p& targetPos, float speed_mi
     if(count >= 60) {
         count = 0;
 
-        gcs().send_text(MAV_SEVERITY_INFO,"_vel_target x:%f y:%f", _vel_target.x, _vel_target.y);
+        //gcs().send_text(MAV_SEVERITY_INFO,"_vel_target x:%f y:%f", _vel_target.x, _vel_target.y);
     }
 }
 
@@ -149,6 +149,10 @@ bool AE_PosControl_Arm::get_position_xy_mm(Vector2f& pos)
     }
 
     AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)_armInfo_backend;
+
+    if(!arminfo_backend->get_healthy()) {
+        return false;
+    }
 
     AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
 
@@ -177,6 +181,10 @@ bool AE_PosControl_Arm::get_vel_xy_mmpers(Vector2f& vel)
     }
 
     AE_RobotArmInfo_TBM *arminfo_backend = (AE_RobotArmInfo_TBM*)_armInfo_backend;
+
+    if(!arminfo_backend->get_healthy()) {
+        return false;
+    }
 
     AE_RobotArmInfo_TBM::TBM_Cutting_Header_State state_tbm = arminfo_backend->get_TBM_cutting_header_state();
 

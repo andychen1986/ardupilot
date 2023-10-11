@@ -72,7 +72,7 @@ bool AE_SlewingEncoder_OID::get_slewing_encoder_reading(uint32_t &reading_full_c
                     // get the current data
                     uint16_t ammeter_amperes = ((uint16_t)linebuf[7] << 8) | linebuf[8];
                     // data validity verification, full_turn_count = 64*4096
-                    if (full_turn_count > state.max_single_turn_count*state.max_total_turns_count || ammeter_amperes > 3000) {
+                    if (full_turn_count > (u_int32_t)state.max_single_turn_count*state.max_total_turns_count || ammeter_amperes > 3000) {
                         // this reading is out of positive range
                         count_out_of_positive_range++;
                     } else if (full_turn_count < 1)  {

@@ -111,6 +111,69 @@ public:
         DOWN_ALERT = 2,
         EMERG  = 3,
     };
+    //////////////////////////////////////////
+    // TBM param, refer to the website below to determine the specific meaning of the paramters
+    // 
+    struct TBM_PARAM{
+        // AP_Float    _cylinder_max[4];   // The maximum stroke of the oil cylinder,0/1 are cutting_header height/vertical and 2/3 are back_support_leg left/right
+        //TBM cutting head param(test by excavator)         
+        AP_Float    _ch_cylinder_max[2];
+        AP_Float    _mm_AC;
+        AP_Float    _mm_BC;
+        AP_Float    _mm_CF;
+        AP_Float    _mm_JL;
+        AP_Float    _mm_JC;
+        AP_Float    _deg_BFC;
+        AP_Float    _deg_BCF;
+        AP_Float    _deg_TCA;
+        
+        // TBM slewing param(test by TBM)
+        AP_Float _mm_AB;
+        AP_Float _mm_OB;
+        AP_Float _deg_OBA;
+
+        //TBM Back support leg param(test by TBM)
+        AP_Float    _bsl_cylinder_max[2]; 
+        AP_Float    _mm_CD;
+        AP_Float    _mm_DF;
+        AP_Float    _mm_GI;
+        AP_Float    _mm_CI;
+        AP_Float    _deg_CDH;
+    };
+
+    
+    //////////////////////////////////////////
+    // Excavator param, refer to the website below to determine the specific meaning of the paramters
+    // https://gitee.com/andychen183/roadheader_gcs/issues/I7BLTG
+    struct EXCVT_PARAM{
+        AP_Float    _cylinder_max[3];       //The maximum stroke of the boom/forearm/bucket oil cylinder
+        AP_Float    _cylinder_min[3];       //The minimum stroke of the boom/forearm/bucket oil cylinder
+        AP_Float    _mm_JC;
+        AP_Float    _mm_CF;
+        AP_Float    _mm_FQ;
+        AP_Float    _mm_QV;
+        AP_Float    _mm_JL;
+        AP_Float    _mm_QN;
+        AP_Float    _mm_QK;
+        AP_Float    _mm_MK;
+        AP_Float    _mm_MN;
+        AP_Float    _mm_BC;
+        AP_Float    _mm_AC;
+        AP_Float    _mm_DF;
+        AP_Float    _mm_GN;
+        AP_Float    _mm_EF;
+        AP_Float    _deg_BFC;
+        AP_Float    _deg_FNQ;
+        AP_Float    _deg_GNF;
+        AP_Float    _deg_NQF;
+        AP_Float    _deg_KQV;
+        AP_Float    _deg_BCF;
+        AP_Float    _deg_TCA;
+        AP_Float    _deg_DFC;
+        AP_Float    _deg_QFG;
+        AP_Float    _deg_GFE;
+        AP_Float    _deg_GNQ;
+    };
 
     // perform any required initialisation of different arm type
     // update_rate_hz should be the rate at which the update method will be called in hz
@@ -163,70 +226,11 @@ private:
     // below are parameters shown at the mission planner if the first param "_enabled" is 1
     AP_Int8             _enabled;               // enabled/disabled
     AP_Enum<Type>       _type;                  // Robot Arm Info Type
-    //////////////////////////////////////////
-    // Excavator param, refer to the website below to determine the specific meaning of the paramters
-    // https://gitee.com/andychen183/roadheader_gcs/issues/I7BLTG
-    struct EXCVT_PARAM{
-        AP_Float    _cylinder_max[3];       //The maximum stroke of the boom/forearm/bucket oil cylinder
-        AP_Float    _cylinder_min[3];       //The minimum stroke of the boom/forearm/bucket oil cylinder
-        AP_Float    _mm_JC;
-        AP_Float    _mm_CF;
-        AP_Float    _mm_FQ;
-        AP_Float    _mm_QV;
-        AP_Float    _mm_JL;
-        AP_Float    _mm_QN;
-        AP_Float    _mm_QK;
-        AP_Float    _mm_MK;
-        AP_Float    _mm_MN;
-        AP_Float    _mm_BC;
-        AP_Float    _mm_AC;
-        AP_Float    _mm_DF;
-        AP_Float    _mm_GN;
-        AP_Float    _mm_EF;
-        AP_Float    _deg_BFC;
-        AP_Float    _deg_FNQ;
-        AP_Float    _deg_GNF;
-        AP_Float    _deg_NQF;
-        AP_Float    _deg_KQV;
-        AP_Float    _deg_BCF;
-        AP_Float    _deg_TCA;
-        AP_Float    _deg_DFC;
-        AP_Float    _deg_QFG;
-        AP_Float    _deg_GFE;
-        AP_Float    _deg_GNQ;
-    } excavtor_param;
-
-    //////////////////////////////////////////
-    // TBM param, refer to the website below to determine the specific meaning of the paramters
-    // 
-    struct TBM_PARAM{
-        // AP_Float    _cylinder_max[4];   // The maximum stroke of the oil cylinder,0/1 are cutting_header height/vertical and 2/3 are back_support_leg left/right
-        //TBM cutting head param(test by excavator)         
-        AP_Float    _ch_cylinder_max[2];
-        AP_Float    _mm_AC;
-        AP_Float    _mm_BC;
-        AP_Float    _mm_CF;
-        AP_Float    _mm_JL;
-        AP_Float    _mm_JC;
-        AP_Float    _deg_BFC;
-        AP_Float    _deg_BCF;
-        AP_Float    _deg_TCA;
-        
-        // TBM slewing param(test by TBM)
-        AP_Float _mm_AB;
-        AP_Float _mm_OB;
-        AP_Float _deg_OBA;
-
-        //TBM Back support leg param(test by TBM)
-        AP_Float    _bsl_cylinder_max[2]; 
-        AP_Float    _mm_CD;
-        AP_Float    _mm_DF;
-        AP_Float    _mm_GI;
-        AP_Float    _mm_CI;
-        AP_Float    _deg_CDH;
-    } tbm_param;
 
     static AE_RobotArmInfo *_singleton; //singleton
+
+    EXCVT_PARAM excavtor_param;
+    TBM_PARAM tbm_param;
 };
 
 namespace AE {
