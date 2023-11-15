@@ -48,7 +48,10 @@ public:
 private:
     float rotation_speed;		// rad/s the rotating speed of the rotation calculated by pwm
     float boom_speed;			  // mm/s the speed of the boom cylinder calculated by pwm
-    float boom_cylinder_length;
+    float boom_cylinder_length; // mm
+    float sprocket_rotation_speed; // rad/s
+    float support_leg_cylinder_length; // mm
+    float support_leg_speed; // mm/s
     float rotation_rad;
     bool is_init;
 
@@ -57,7 +60,7 @@ private:
 
     AP_AHRS& ahrs;
 
-    void calc_speed(uint16_t pwm_rotation, uint16_t pwm_boom);
+    void calc_speed(uint16_t pwm_rotation, uint16_t pwm_boom, uint16_t pwm_support_leg, uint16_t pwm_sprocket);
     bool get_tbm_info();
 
     void init();

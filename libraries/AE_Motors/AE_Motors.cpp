@@ -215,13 +215,29 @@ void AE_Motors::output(bool armed,  float dt)
 //  returns true if checks pass, false if they fail.  report should be true to send text messages to GCS
 bool AE_Motors::pre_arm_check(bool report) const
 {
-    if ((
-         SRV_Channels::function_assigned(SRV_Channel::k_bucket) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_rotation)) &&
-        (SRV_Channels::function_assigned(SRV_Channel::k_cutting_header) ||
-         SRV_Channels::function_assigned(SRV_Channel::k_support_leg))) {
+    if (have_excavator() && have_TBM()) {
         if (report) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: AE_Motors servo configured");
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: excavator and tbm servo configured");
+        }
+        return false;
+    }
+
+    // check if only one of tbm servo output has been configured
+    if (!have_TBM() &&
+        (SRV_Channels::function_assigned(SRV_Channel::k_cutting_header) ||
+        SRV_Channels::function_assigned(SRV_Channel::k_support_leg))) {
+        if (report) {
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: check tbm servo config");
+        }
+        return false;
+    }
+
+    // check if only one of excavator servo outputs has been configured
+    if (!have_excavator() &&
+        (SRV_Channels::function_assigned(SRV_Channel::k_forearm) ||
+        SRV_Channels::function_assigned(SRV_Channel::k_bucket))) {
+        if (report) {
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "PreArm: check excavator servo config");
         }
         return false;
     }

@@ -5,7 +5,16 @@ namespace SITL {
 
 #define    Rotation_Channel     9
 #define    Boom_Channel         11
+#define    Support_Leg_Channel  10
+#define    Sprocket_Channel     8
+
+#define TBM_SIM_Debug
+
+#ifdef TBM_SIM_Debug
 #define Debug(fmt, args ...)  do {::fprintf(stderr, "%s:%d: " fmt "\n", __FUNCTION__, __LINE__, ## args); } while(0)
+#else
+#define Debug(fmt, args ...)
+#endif
 
 void SimTBM::init()
 {
@@ -19,7 +28,6 @@ void SimTBM::init()
     Matrix3f dboomrboom;
 
     dbodyrbody.from_euler(ahrs.get_roll(), ahrs.get_pitch(), ahrs.get_yaw());
-    Debug("n_ahrs_roll:%f,n_ahrs_pitch:%f,n_ahrs_yaw:%f", degrees(ahrs.get_roll()), degrees(ahrs.get_pitch()), degrees(ahrs.get_yaw()));
     
     Matrix3f dboomrdbody;
     dboomrdbody.from_euler(0, 0, radians(-90));
@@ -39,13 +47,15 @@ void SimTBM::init()
     dboomrboom = dboomrbody*dboomrboom;
     // bodyrboom
     dboomrboom.to_euler(&_euler_boom_e2b_from_sensor.x,&_euler_boom_e2b_from_sensor.y,&_euler_boom_e2b_from_sensor.z);
-    Debug("n_b_roll:%f,n_b_pitch:%f,n_b_yaw:%f", degrees(_euler_boom_e2b_from_sensor.x), degrees(_euler_boom_e2b_from_sensor.y),degrees(_euler_boom_e2b_from_sensor.z));
 
     boom_cylinder_length = sqrt(tbm_params._mm_AC * tbm_params._mm_AC + tbm_params._mm_BC * tbm_params._mm_BC -  \
                             2*tbm_params._mm_AC*tbm_params._mm_BC * cos(radians(tbm_params._deg_TCA) + \
                             radians(tbm_params._deg_BCF) + radians(tbm_params._deg_BFC) + _euler_boom_e2b_from_sensor.x));
 
     rotation_rad = _euler_boom_e2b_from_sensor.z;
+
+    sprocket_rotation_speed = 0;
+    support_leg_cylinder_length = 300;
 
     is_init = true;
 }
@@ -61,26 +71,34 @@ void SimTBM::update(const struct sitl_input &input)
         init();
     }
 
-    calc_speed(input.servos[Rotation_Channel-1], input.servos[Boom_Channel-1]);
+    calc_speed(input.servos[Rotation_Channel-1], input.servos[Boom_Channel-1], \
+               input.servos[Support_Leg_Channel-1], input.servos[Sprocket_Channel-1]);
 
     // how much time has passed?
     float delta_time = frame_time_us * 1.0e-6f;
 
     AE_RobotArmInfo::TBM_PARAM tbm_params = _armInfo_backend->get_tbm_param();
 
-    Debug("boom:%f, rotation:%f, pwm_boom:%d, pwm_rotation:%d", boom_speed, rotation_speed, input.servos[Boom_Channel-1], input.servos[Rotation_Channel-1]);
+    Debug("pwm_boom:%d, pwm_rotation:%d", input.servos[Boom_Channel-1], input.servos[Rotation_Channel-1]);
+    Debug("pwm_support_leg:%d, pwm_sprocket:%d", input.servos[Support_Leg_Channel-1], input.servos[Sprocket_Channel-1]);
+    Debug("boom_speed:%f, rotation_speed:%f", boom_speed, rotation_speed);
+    Debug("sprocket_speed:%f", sprocket_rotation_speed);
+    Debug("support_leg_cylinder_length:%f", support_leg_cylinder_length);
 
     boom_cylinder_length += boom_speed * delta_time;
-
     rotation_rad += rotation_speed * delta_time;
+
+    support_leg_cylinder_length += support_leg_speed * delta_time;
+    if(support_leg_cylinder_length < 0) {
+        support_leg_cylinder_length = 0;
+    }
+
     Debug("boom_cylinder_length:%f", boom_cylinder_length);
 
     float theta2 = acosf( (powf(tbm_params._mm_AC, 2) + powf(tbm_params._mm_BC, 2) - powf(boom_cylinder_length, 2)) \
                         / (2*tbm_params._mm_AC*tbm_params._mm_BC)) - radians(tbm_params._deg_BCF) - radians(tbm_params._deg_TCA);
-    // Debug("tbm_params._mm_AC:%f, tbm_params._mm_BC:%f, boom_cylinder_length:%f",powf(tbm_params._mm_AC, 2), powf(tbm_params._mm_BC.get(), 2), 2*tbm_params._mm_AC*tbm_params._mm_BC);
 
     float roll_to_body = theta2 - radians(tbm_params._deg_BFC);
-    // Debug("roll_to_body:%f rotation_rad:%f", roll_to_body, rotation_rad);
 
     Matrix3f bodyrboom;
 
@@ -90,7 +108,7 @@ void SimTBM::update(const struct sitl_input &input)
 
     Matrix3f dbodyrbody;
     dbodyrbody.from_euler(ahrs.get_roll(), ahrs.get_pitch(), ahrs.get_yaw());
-    Debug("ahrs_roll:%f,ahrs_pitch:%f,ahrs_yaw:%f", degrees(ahrs.get_roll()), degrees(ahrs.get_pitch()), degrees(ahrs.get_yaw()));
+    Debug("apm_roll:%f, apm_pitch:%f, apm_yaw:%f", degrees(ahrs.get_roll()), degrees(ahrs.get_pitch()), degrees(ahrs.get_yaw()));
 
     Matrix3f dboomrdbody;
     dboomrdbody.from_euler(0, 0, radians(-90));
@@ -105,18 +123,19 @@ void SimTBM::update(const struct sitl_input &input)
     sitl->state.inclination_state.pitch_deg.x = degrees(sitl->state.inclination_state.pitch_deg.x);
     sitl->state.inclination_state.yaw_deg.x = degrees(sitl->state.inclination_state.yaw_deg.x);
 
-    Debug("roll:%f,pitch:%f,yaw:%f",sitl->state.inclination_state.roll_deg.x, sitl->state.inclination_state.pitch_deg.x, sitl->state.inclination_state.yaw_deg.x);
+    Debug("incli_roll:%f, incli_pitch:%f, incli_yaw:%f",sitl->state.inclination_state.roll_deg.x, sitl->state.inclination_state.pitch_deg.x, sitl->state.inclination_state.yaw_deg.x);
     Debug("                                              ");
 
     SimRover::update(input);
 }
 
 // Motor model
-void SimTBM::calc_speed(uint16_t pwm_rotation, uint16_t pwm_boom)
+void SimTBM::calc_speed(uint16_t pwm_rotation, uint16_t pwm_boom, uint16_t pwm_support_leg, uint16_t pwm_sprocket)
 {
-    if(pwm_boom < 1100  || pwm_boom > 1900 || pwm_rotation < 1100 || pwm_rotation > 1900)
+    if(pwm_boom < 1100  || pwm_boom > 1900 || pwm_rotation < 1100 || pwm_rotation > 1900 || \
+       pwm_support_leg < 1100  || pwm_support_leg > 1900 || pwm_sprocket < 1100 || pwm_sprocket > 1900 )
     {
-        boom_speed = rotation_speed = 0;
+        boom_speed = rotation_speed = pwm_support_leg = pwm_sprocket = 0;
 
         return;
     }
@@ -124,6 +143,10 @@ void SimTBM::calc_speed(uint16_t pwm_rotation, uint16_t pwm_boom)
     boom_speed = (pwm_boom - 1500) / 500.0 * 15;
 
     rotation_speed = (pwm_rotation - 1500) / 500.0 * radians(16);
+
+    support_leg_speed = (pwm_support_leg - 1500) / 500.0 * 15;
+
+    sprocket_rotation_speed = (pwm_sprocket - 1500) / 500.0 * radians(16);
 }
 
 bool SimTBM::get_tbm_info()

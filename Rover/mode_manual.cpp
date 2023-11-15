@@ -41,13 +41,21 @@ void ModeManual::update()
     g2.motors.set_lateral(desired_lateral);
 
     // copy RC scaled inputs to AE_Motors outputs
-    float desired_boom, desired_forearm, desired_bucket, desired_rotation;
+    float desired_boom, desired_forearm, desired_bucket, desired_rotation, desired_cutting_header, desired_support_leg;
     desired_boom = constrain_float(rover.channel_boom->get_control_in(),-100.0f,100.0f);
     desired_forearm = constrain_float(rover.channel_forearm->get_control_in(),-100.0f,100.0f);
     desired_bucket = constrain_float(rover.channel_bucket->get_control_in(),-100.0f,100.0f);
     desired_rotation = constrain_float(rover.channel_rotation->get_control_in(),-100.0f,100.0f);
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+    desired_cutting_header = constrain_float(rover.channel_cutting_header->get_control_in(),-100.0f,100.0f);
+    desired_support_leg = constrain_float(rover.channel_support_leg->get_control_in(),-100.0f,100.0f);
+#endif  
     g2.arm_motors.set_boom(desired_boom);
     g2.arm_motors.set_forearm(desired_forearm);
     g2.arm_motors.set_bucket(desired_bucket);
     g2.arm_motors.set_rotation(desired_rotation);
+#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
+    g2.arm_motors.set_cutting_header(desired_cutting_header);
+    g2.arm_motors.set_support_leg(desired_support_leg);
+#endif
 }

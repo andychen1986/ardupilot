@@ -163,7 +163,10 @@ void Inclination::detect_instance(uint8_t instance, uint8_t& serial_instance)
 
     case Type::SIM:
     #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        _add_backend(new AP_Inclination_SITL(state[instance], params[instance]), instance, serial_instance);
+        for(uint8_t i=instance; i<INCLINATION_MAX_INSTANCES; i++)
+        {
+            _add_backend(new AP_Inclination_SITL(state[i], params[i]), i, serial_instance++);
+        }
     #endif
         break;
 
