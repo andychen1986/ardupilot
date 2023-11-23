@@ -86,28 +86,28 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Description: distance_boom_to_slewing
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV1_JC",    5, AE_RobotArmInfo, excavtor_param._mm_JC, 39),
+    AP_GROUPINFO("EXV1_JC",    5, AE_RobotArmInfo, excavtor_param._mm_JC, 47.6),
 
     // @Param: Distance_CF
     // @DisplayName: distance CF
     // @Description: distance CF
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV2_CF",    6, AE_RobotArmInfo, excavtor_param._mm_CF, 408),
+    AP_GROUPINFO("EXV2_CF",    6, AE_RobotArmInfo, excavtor_param._mm_CF, 407),
 
     // @Param: Distance_FQ
     // @DisplayName: distance FQ
     // @Description: distance FQ
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV3_FQ",    7, AE_RobotArmInfo, excavtor_param._mm_FQ, 194),
+    AP_GROUPINFO("EXV3_FQ",    7, AE_RobotArmInfo, excavtor_param._mm_FQ, 198),
 
     // @Param: Distance_QV
     // @DisplayName: distance QV
     // @Description: distance QV
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV4_QV",    8, AE_RobotArmInfo, excavtor_param._mm_QV, 147),
+    AP_GROUPINFO("EXV4_QV",    8, AE_RobotArmInfo, excavtor_param._mm_QV, 158),
 
     // @Param: Distance JL
     // @DisplayName: distance JL
@@ -121,12 +121,12 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Description: distance_QN
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV6_QN",    10, AE_RobotArmInfo, excavtor_param._mm_QN, 33),
+    AP_GROUPINFO("EXV6_QN",    10, AE_RobotArmInfo, excavtor_param._mm_QN, 32.5),
 
     // @Param: Distance_QK
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV7_QK",    11, AE_RobotArmInfo, excavtor_param._mm_QK, 44),
+    AP_GROUPINFO("EXV7_QK",    11, AE_RobotArmInfo, excavtor_param._mm_QK, 43),
 
     // @Param: Distance_MK
     // @User: Advanced
@@ -136,87 +136,87 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Param: Distance_MN
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV9_MN",    13, AE_RobotArmInfo,excavtor_param._mm_MN, 53),
+    AP_GROUPINFO("EXV9_MN",    13, AE_RobotArmInfo,excavtor_param._mm_MN, 54),
 
     // @Param: Distance_BC
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV10_BC",    14, AE_RobotArmInfo, excavtor_param._mm_BC, 196.8),
+    AP_GROUPINFO("EXV10_BC",    14, AE_RobotArmInfo, excavtor_param._mm_BC, 161),
 
     // @Param: Distance_AC
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV11_AC",    15, AE_RobotArmInfo, excavtor_param._mm_AC, 66),
+    AP_GROUPINFO("EXV11_AC",    15, AE_RobotArmInfo, excavtor_param._mm_AC, 68),
 
     // @Param: Distance_DF
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV12_DF",    16, AE_RobotArmInfo, excavtor_param._mm_DF, 234.5),
+    AP_GROUPINFO("EXV12_DF",    16, AE_RobotArmInfo, excavtor_param._mm_DF, 236.8),
 
     // @Param: Distance_GN
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV13_GN",    17, AE_RobotArmInfo, excavtor_param._mm_GN, 183),
+    AP_GROUPINFO("EXV13_GN",    17, AE_RobotArmInfo, excavtor_param._mm_GN, 178),
 
     // @Param: Distance_EF
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("EXV14_EF",    18, AE_RobotArmInfo, excavtor_param._mm_EF, 66),
+    AP_GROUPINFO("EXV14_EF",    18, AE_RobotArmInfo, excavtor_param._mm_EF, 63.6),
 
     // @Param: Angle_BFC
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX1_BFC",    19, AE_RobotArmInfo, excavtor_param._deg_BFC, 26),
+    AP_GROUPINFO("EX1_BFC",    19, AE_RobotArmInfo, excavtor_param._deg_BFC, 17.5),
 
     // @Param: Angle_FNQ
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX2_FNQ",    20, AE_RobotArmInfo, excavtor_param._deg_FNQ, 176),
+    AP_GROUPINFO("EX2_FNQ",    20, AE_RobotArmInfo, excavtor_param._deg_FNQ, 173),
 
     // @Param: Angle_GNF
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX3_GNF",    21, AE_RobotArmInfo, excavtor_param._deg_GNF, 21),
+    AP_GROUPINFO("EX3_GNF",    21, AE_RobotArmInfo, excavtor_param._deg_GNF, 20.5),
 
     // @Param: Angle_NQF
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX4_NQF",    22, AE_RobotArmInfo, excavtor_param._deg_NQF, 6),
+    AP_GROUPINFO("EX4_NQF",    22, AE_RobotArmInfo, excavtor_param._deg_NQF, 5.5),
 
     // @Param: Angle_KQV
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("_EX5_KQV",    23, AE_RobotArmInfo, excavtor_param._deg_KQV, 110),
+    AP_GROUPINFO("_EX5_KQV",    23, AE_RobotArmInfo, excavtor_param._deg_KQV, 108),
 
     // @Param: Angle_BCF
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX6_BCF",    24, AE_RobotArmInfo, excavtor_param._deg_BCF, 35),
+    AP_GROUPINFO("EX6_BCF",    24, AE_RobotArmInfo, excavtor_param._deg_BCF, 28),
 
     // @Param: Angle_TCA
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX7_TCA",    25, AE_RobotArmInfo, excavtor_param._deg_TCA, 45),
+    AP_GROUPINFO("EX7_TCA",    25, AE_RobotArmInfo, excavtor_param._deg_TCA, 47),
 
     // @Param: Angle_DFC
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX8_DFC",    26, AE_RobotArmInfo, excavtor_param._deg_DFC, 50),
+    AP_GROUPINFO("EX8_DFC",    26, AE_RobotArmInfo, excavtor_param._deg_DFC, 33),
 
     // @Param: Angle_QFG
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX9_QFG",    27, AE_RobotArmInfo, excavtor_param._deg_QFG, 97),
+    AP_GROUPINFO("EX9_QFG",    27, AE_RobotArmInfo, excavtor_param._deg_QFG, 94),
 
     // @Param: Angle_GFE
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX10_GFE",    28, AE_RobotArmInfo, excavtor_param._deg_GFE, 46),
+    AP_GROUPINFO("EX10_GFE",    28, AE_RobotArmInfo, excavtor_param._deg_GFE, 51),
 
     // @Param: Angle_GNQ
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("EX11_GNQ",    29, AE_RobotArmInfo, excavtor_param._deg_GNQ, 162),
+    AP_GROUPINFO("EX11_GNQ",    29, AE_RobotArmInfo, excavtor_param._deg_GNQ, 168),
     //Excavator param
     //////////////////////////////////////////
     //////////////////////////////////////////
@@ -228,7 +228,7 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("T0_BM_MX",    30, AE_RobotArmInfo, tbm_param._ch_cylinder_max[0], 260),
+    AP_GROUPINFO("T0_BM_MX",    30, AE_RobotArmInfo, tbm_param._ch_cylinder_max[0], 255),
 
     // @Param: TBM_CUTTING_HEADER_HORIZONTAL_CYLINDER_MAX
     // @DisplayName: TBM cutting header horizontal cylinder maximum stroke
@@ -237,24 +237,24 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("T1_HZ_MX",    31, AE_RobotArmInfo, tbm_param._ch_cylinder_max[1], 260),
+    AP_GROUPINFO("T1_HZ_MX",    31, AE_RobotArmInfo, tbm_param._ch_cylinder_max[1], 255),
 
     // @Param: Distance_AC
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("TBM2_AC",    32, AE_RobotArmInfo, tbm_param._mm_AC, 66),
+    AP_GROUPINFO("TBM2_AC",    32, AE_RobotArmInfo, tbm_param._mm_AC, 68),
     
     // @Param: Distance_BC
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("TBM3_BC",    33, AE_RobotArmInfo, tbm_param._mm_BC, 196.8),
+    AP_GROUPINFO("TBM3_BC",    33, AE_RobotArmInfo, tbm_param._mm_BC, 161),
 
     // @Param: Distance_CF
     // @DisplayName: distance CF
     // @Description: distance CF
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("_TBM4_CF",    34, AE_RobotArmInfo, tbm_param._mm_CF, 408),
+    AP_GROUPINFO("_TBM4_CF",    34, AE_RobotArmInfo, tbm_param._mm_CF, 407),
 
     // @Param: Distance JL
     // @DisplayName: distance JL
@@ -268,22 +268,22 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Description: distance_boom_to_slew
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("_TBM6_JC",    36, AE_RobotArmInfo, tbm_param._mm_JC, 39),
+    AP_GROUPINFO("_TBM6_JC",    36, AE_RobotArmInfo, tbm_param._mm_JC, 47.6),
 
     // @Param: Angle_BFC
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("_TBM7_BFC",    37, AE_RobotArmInfo, tbm_param._deg_BFC, 26),
+    AP_GROUPINFO("_TBM7_BFC",    37, AE_RobotArmInfo, tbm_param._deg_BFC, 17.5),
 
     // @Param: Angle_BCF
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("_TBM8_BCF",    38, AE_RobotArmInfo, tbm_param._deg_BCF, 35),
+    AP_GROUPINFO("_TBM8_BCF",    38, AE_RobotArmInfo, tbm_param._deg_BCF, 28),
 
     // @Param: Angle_TCA
     // @User: Advanced
     // @Units: deg
-    AP_GROUPINFO("_TBM9_TCA",    39, AE_RobotArmInfo, tbm_param._deg_TCA, 45),
+    AP_GROUPINFO("_TBM9_TCA",    39, AE_RobotArmInfo, tbm_param._deg_TCA, 47),
 
     // @Param: TBM_BACK_SUPPORT_LEFT_CYLINDER_MAX
     // @DisplayName: TBM back support leg left cylinder maximum stroke
