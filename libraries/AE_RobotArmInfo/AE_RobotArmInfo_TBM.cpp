@@ -37,6 +37,7 @@ void AE_RobotArmInfo_TBM::init()
     {
       _cuthead_state.cylinder_status[i].cylinder_name = (AE_RobotArmInfo::TBM_CH_OC_Name)i;
       _cuthead_state.cylinder_status[i].length_max_mm = get_tbm_param()._ch_cylinder_max[i];
+      _cuthead_state.cylinder_status[i].length_min_mm = get_tbm_param()._ch_cylinder_min[i];
       _cuthead_state.cylinder_status[i].length_mm = 0;
       _cuthead_state.cylinder_status[i].velocity_mms = 0;
     }
@@ -45,6 +46,7 @@ void AE_RobotArmInfo_TBM::init()
     {
       _back_leg_state.cylinder_status[i].cylinder_name = (AE_RobotArmInfo::TBM_BSL_OC_Name)i;
       _back_leg_state.cylinder_status[i].length_max_mm = get_tbm_param()._bsl_cylinder_max[i];
+      _back_leg_state.cylinder_status[i].length_min_mm = get_tbm_param()._bsl_cylinder_min[i];
       _back_leg_state.cylinder_status[i].length_mm = 0;
       _back_leg_state.cylinder_status[i].velocity_mms = 0;
     }
@@ -202,7 +204,25 @@ void AE_RobotArmInfo_TBM::Write_TBM_CutheadInfo()
 
 int8_t AE_RobotArmInfo_TBM::get_cylinder_length_state(int8_t cylinder_number)
 {
-    return AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY;
+    if(!_state.flags.healthy){
+        return AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG;
+    }
+
+    if(cylinder_number != 0) return AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY;
+
+    float distance_to_max_mm = _cuthead_state.cylinder_status[cylinder_number].length_max_mm - _cuthead_state.cylinder_status[cylinder_number].length_mm;
+    float distance_to_min_mm = _cuthead_state.cylinder_status[cylinder_number].length_mm - _cuthead_state.cylinder_status[cylinder_number].length_min_mm;
+
+    if(distance_to_max_mm > 10.0f && distance_to_min_mm > 10.0f)
+        return AE_RobotArmInfo::Robot_Arm_Safe_State::SAFETY;
+
+    else if(distance_to_max_mm <= 10.0f )
+        return AE_RobotArmInfo::Robot_Arm_Safe_State::UP_ALERT;
+
+    else if(distance_to_min_mm <= 10.0f )
+        return AE_RobotArmInfo::Robot_Arm_Safe_State::DOWN_ALERT;
+
+    return AE_RobotArmInfo::Robot_Arm_Safe_State::EMERG;
 }
 
 

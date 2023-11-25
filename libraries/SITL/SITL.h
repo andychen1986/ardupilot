@@ -92,6 +92,20 @@ struct sitl_fdm {
         Vector3f pitch_deg;                // pitch_deg.x/.y/.z denote boom/forearm/bucket angle in degree
         Vector3f yaw_deg;                  // yaw_deg.x/.y/.z denote boom/forearm/bucket angle in degree
     } inclination_state;
+
+    struct
+    {
+        float rdheader_xb;      // the coordinate of roadheader X in the body frame.
+        float rdheader_yb;      // the coordinate of roadheader Y in the body frame.
+        float rdheader_zb;      // the coordinate of roadheader Z in the body frame.
+        float roll_b;           // Attitude roll expressed as Euler angles
+        float pitch_b;          // Attitude pitch expressed as Euler angles
+        float yaw_b;            // Attitude yaw expressed as Euler angles
+        float boom_cylinder_L;  // the stroke of the boom cylinder.
+        float support_leg_rad;  // radians of support leg.
+        float cutting_header_S; // Angular speed of cutting header.
+        float turning_angle;    // the angle value of the encoder of the rotary table
+    } tbm_state;
 };
 
 // number of rc output channels

@@ -83,7 +83,7 @@ void ModeTBM::navigate_to_arm_waypoint()
         gcs().send_text(MAV_SEVERITY_INFO,"desired_output x:%f y:%f", desired_output.x, desired_output.y);
     }
 
-    g2.arm_motors.set_boom(desired_output.y);
+    g2.arm_motors.set_boom(-1 * desired_output.y);
     g2.arm_motors.set_rotation(desired_output.x);
 }
 
@@ -94,8 +94,10 @@ void ModeTBM::stop_arm()
     g2.arm_motors.set_rotation(0);
 }
 
-#define xscale 450
-#define yscale 350
+// #define xscale 450
+// #define yscale 350
+#define xscale 533
+#define yscale 608
 // 坐标转换，变换为在gcs中以底边的中间为原点，向右为x轴，向上为y轴
 void ModeTBM::convert_wp(RobotArmLocation& cmd)
 {

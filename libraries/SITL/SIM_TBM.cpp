@@ -55,7 +55,7 @@ void SimTBM::init()
     rotation_rad = _euler_boom_e2b_from_sensor.z;
 
     sprocket_rotation_speed = 0;
-    support_leg_cylinder_length = 300;
+    support_leg_cylinder_length = 210; // 175 ~ 245
 
     is_init = true;
 }
@@ -89,9 +89,8 @@ void SimTBM::update(const struct sitl_input &input)
     rotation_rad += rotation_speed * delta_time;
 
     support_leg_cylinder_length += support_leg_speed * delta_time;
-    if(support_leg_cylinder_length < 0) {
-        support_leg_cylinder_length = 0;
-    }
+    constrain_float(support_leg_cylinder_length, 175, 245);
+    sitl->state.tbm_state.support_leg_rad = (support_leg_cylinder_length -175) / 70 * M_PI_2;
 
     Debug("boom_cylinder_length:%f", boom_cylinder_length);
 
@@ -124,6 +123,24 @@ void SimTBM::update(const struct sitl_input &input)
     sitl->state.inclination_state.yaw_deg.x = degrees(sitl->state.inclination_state.yaw_deg.x);
 
     Debug("incli_roll:%f, incli_pitch:%f, incli_yaw:%f",sitl->state.inclination_state.roll_deg.x, sitl->state.inclination_state.pitch_deg.x, sitl->state.inclination_state.yaw_deg.x);
+
+    // update tbm state
+    sitl->state.tbm_state.rdheader_yb =  tbm_params._mm_CF*sinf(theta2) + tbm_params._mm_JL;
+    sitl->state.tbm_state.rdheader_xb = sinf(rotation_rad)*(tbm_params._mm_CF*cosf(theta2) + tbm_params._mm_JC);
+    sitl->state.tbm_state.rdheader_zb = cosf(rotation_rad)*(tbm_params._mm_CF*cosf(theta2) + tbm_params._mm_JC);
+
+    Debug("x:%f, y:%f, z:%f", sitl->state.tbm_state.rdheader_xb, sitl->state.tbm_state.rdheader_yb, sitl->state.tbm_state.rdheader_zb);
+
+    float angle_ACB = radians(tbm_params._deg_TCA) + radians(tbm_params._deg_BCF) + theta2;
+    sitl->state.tbm_state.boom_cylinder_L = sqrt(tbm_params._mm_AC * tbm_params._mm_AC + 
+                                                        tbm_params._mm_BC * tbm_params._mm_BC - 2*tbm_params._mm_AC*tbm_params._mm_BC*cos(angle_ACB));
+
+    sitl->state.tbm_state.roll_b = roll_to_body;
+    sitl->state.tbm_state.pitch_b = 0;
+    sitl->state.tbm_state.yaw_b = rotation_rad;
+
+    sitl->state.tbm_state.cutting_header_S = sprocket_rotation_speed;
+    sitl->state.tbm_state.turning_angle = rotation_rad;
     Debug("                                              ");
 
     SimRover::update(input);

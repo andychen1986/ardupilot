@@ -228,7 +228,7 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("T0_BM_MX",    30, AE_RobotArmInfo, tbm_param._ch_cylinder_max[0], 255),
+    AP_GROUPINFO("T0_BM_MX",    30, AE_RobotArmInfo, tbm_param._ch_cylinder_max[0], 234),
 
     // @Param: TBM_CUTTING_HEADER_HORIZONTAL_CYLINDER_MAX
     // @DisplayName: TBM cutting header horizontal cylinder maximum stroke
@@ -237,7 +237,26 @@ const AP_Param::GroupInfo AE_RobotArmInfo::var_info[] = {
     // @Increment: 0.1
     // @User: Advanced
     // @Units: mm
-    AP_GROUPINFO("T1_HZ_MX",    31, AE_RobotArmInfo, tbm_param._ch_cylinder_max[1], 255),
+    AP_GROUPINFO("T1_HZ_MX",    31, AE_RobotArmInfo, tbm_param._ch_cylinder_max[1], 234),
+
+    //TBM param
+    // @Param: TBM cutting header BOOM_CYLINDER_MIN
+    // @DisplayName: TBM cutting header boom cylinder minimum stroke
+    // @Description: The maximum stroke of the TBM cutting header boom oil cylinder.
+    // @Range: 0 260
+    // @Increment: 0.1
+    // @User: Advanced
+    // @Units: mm
+    AP_GROUPINFO("T0_BM_MN",    45, AE_RobotArmInfo, tbm_param._ch_cylinder_min[0], 175),
+
+    // @Param: TBM_CUTTING_HEADER_HORIZONTAL_CYLINDER_MIN
+    // @DisplayName: TBM cutting header horizontal cylinder minimum stroke
+    // @Description: The maximum stroke of the TBM cutting header horizontal oil cylinder.
+    // @Range: 0 260
+    // @Increment: 0.1
+    // @User: Advanced
+    // @Units: mm
+    AP_GROUPINFO("T1_HZ_MN",    46, AE_RobotArmInfo, tbm_param._ch_cylinder_min[1], 175),
 
     // @Param: Distance_AC
     // @User: Advanced

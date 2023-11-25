@@ -91,13 +91,15 @@ public:
         float length_mm;                        // mm
         float velocity_mms;                     // mm/s
         float length_max_mm;                    // mm        
+        float length_min_mm;                    // mm    
         enum TBM_CH_OC_Name cylinder_name;
     };
 
     struct TBM_BSL_Cylinder_State {
         float length_mm;                        // mm
         float velocity_mms;                     // mm/s
-        float length_max_mm;                    // mm        
+        float length_max_mm;                    // mm  
+        float length_min_mm;                    // mm          
         enum TBM_BSL_OC_Name cylinder_name;
     };
 
@@ -118,6 +120,7 @@ public:
         // AP_Float    _cylinder_max[4];   // The maximum stroke of the oil cylinder,0/1 are cutting_header height/vertical and 2/3 are back_support_leg left/right
         //TBM cutting head param(test by excavator)         
         AP_Float    _ch_cylinder_max[2];
+        AP_Float    _ch_cylinder_min[2];
         AP_Float    _mm_AC;
         AP_Float    _mm_BC;
         AP_Float    _mm_CF;
@@ -134,6 +137,7 @@ public:
 
         //TBM Back support leg param(test by TBM)
         AP_Float    _bsl_cylinder_max[2]; 
+        AP_Float    _bsl_cylinder_min[2]; 
         AP_Float    _mm_CD;
         AP_Float    _mm_DF;
         AP_Float    _mm_GI;

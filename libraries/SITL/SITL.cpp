@@ -530,6 +530,24 @@ void SIM::simstate_send(mavlink_channel_t chan) const
                               radians(state.yawRate),
                               state.latitude*1.0e7,
                               state.longitude*1.0e7);
+    
+    mavlink_msg_tbm_positional_parameters_send(chan,
+        state.tbm_state.rdheader_xb / 533,
+        state.tbm_state.rdheader_yb / 608,
+        state.tbm_state.rdheader_zb,
+        state.tbm_state.boom_cylinder_L,
+        state.tbm_state.turning_angle);
+    
+    mavlink_msg_tbm_sim_status_send(chan,
+        state.tbm_state.rdheader_zb,
+        state.tbm_state.rdheader_xb,
+        -state.tbm_state.rdheader_yb,
+        state.tbm_state.roll_b,
+        state.tbm_state.pitch_b,
+        state.tbm_state.yaw_b,
+        state.tbm_state.boom_cylinder_L,
+        state.tbm_state.support_leg_rad,
+        state.tbm_state.cutting_header_S);
 }
 
 /* report SITL state via MAVLink SIM_STATE */
