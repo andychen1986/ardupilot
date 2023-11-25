@@ -30,23 +30,10 @@ public:
         _cmd_verify_fn(cmd_verify_fn),
         _mission_complete_fn(mission_complete_fn)
     {
-#if CONFIG_HAL_BOARD == HAL_BOARD_SITL
-        if (_singleton != nullptr) {
-            AP_HAL::panic("Mission must be singleton");
-        }
-#endif
-        _singleton = this;
-
         // clear commands
         _current_index = AE_Mission_Arm_CMD_INDEX_NONE;
 
         _flags.state = MISSION_COMPLETE;
-    }
-
-    // get singleton instance
-    static AE_Mission_Arm *get_singleton()
-    {
-        return _singleton;
     }
 
     /// num_commands - returns total number of commands in the mission
@@ -127,9 +114,4 @@ private:
     mission_cmd_fn_t        _cmd_start_fn;  // pointer to function which will be called when a new command is started
     mission_cmd_fn_t        _cmd_verify_fn; // pointer to function which will be called repeatedly to ensure a command is progressing
     mission_complete_fn_t   _mission_complete_fn;   // pointer to function which will be called when mission completes
-};
-
-namespace AE
-{
-AE_Mission_Arm *ae_mission_arm();
 };

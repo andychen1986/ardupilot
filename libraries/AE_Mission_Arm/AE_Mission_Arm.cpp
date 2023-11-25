@@ -265,16 +265,3 @@ bool AE_Mission_Arm::is_last_wp()
     
     return !get_next_cmd(_current_index+1, cmd);
 }
-
-// singleton instance
-AE_Mission_Arm *AE_Mission_Arm::_singleton;
-
-namespace AE
-{
-
-AE_Mission_Arm *ae_mission_arm()
-{
-    return AE_Mission_Arm::get_singleton();
-}
-
-}

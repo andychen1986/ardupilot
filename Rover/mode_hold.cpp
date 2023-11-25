@@ -5,10 +5,16 @@
 bool ModeHold::_enter()
 {
     //切换模式为TBM模式
-    //rover.set_mode(rover.mode_tbm, ModeReason::GCS_COMMAND);
+    if((enum AE_type)rover.g2.AE_type.get() == AE_type::TBM)
+    {
+        rover.set_mode(rover.mode_tbm, ModeReason::GCS_COMMAND);
+    }
     
     //切换模式为Excavator模式
-    rover.set_mode(rover.mode_excavator, ModeReason::GCS_COMMAND);
+    if((enum AE_type)rover.g2.AE_type.get() == AE_type::EXCAVATOR)
+    {
+        rover.set_mode(rover.mode_excavator, ModeReason::GCS_COMMAND);
+    }
 
     return false;
 }
